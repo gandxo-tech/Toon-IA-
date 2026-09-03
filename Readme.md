@@ -1,5 +1,5 @@
 
-```markdown
+
 <div align="center">
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=32&pause=1000&color=7F52FF&center=true&vCenter=true&width=600&lines=ToonIA;Studio+de+Webtoons+IA;Par+GANDXO+TECH" alt="Typing SVG" />
@@ -181,5 +181,5 @@ com.example/
 ⭐ *Si ce projet t'inspire, une étoile sur GitHub fait toujours plaisir* ⭐
 
 </div>
-```
+
 
