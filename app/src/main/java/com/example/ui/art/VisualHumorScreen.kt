@@ -48,6 +48,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -141,6 +142,31 @@ fun VisualHumorScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (uiState.visualBible != null || uiState.humorDna != null) {
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.validateAllVisualHumor()
+                                onNavigateToCoverMarketing()
+                            },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            Text("Tout valider & Continuer vers la Couverture", modifier = Modifier.padding(8.dp))
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         Column(

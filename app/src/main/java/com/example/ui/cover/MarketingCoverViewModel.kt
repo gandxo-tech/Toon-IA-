@@ -270,6 +270,15 @@ class MarketingCoverViewModel(
         _uiState.update { it.copy(errorMessage = null, successMessage = null, imageErrorMessage = null) }
     }
 
+    /**
+     * Valide explicitement et passe à l'étape suivante.
+     */
+    fun validateAllMarketingCover() {
+        if (!_uiState.value.isCanonValidated) {
+            validateToCanon(forceValidation = true)
+        }
+    }
+
     class Factory(
         private val useCase: MarketingCoverUseCase,
         private val imageUseCase: GenerateCoverImageUseCase? = null,

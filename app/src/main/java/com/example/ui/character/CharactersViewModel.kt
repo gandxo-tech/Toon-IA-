@@ -323,4 +323,16 @@ class CharactersViewModel @JvmOverloads constructor(
     fun dismissContradictionDialog() {
         _uiState.update { it.copy(activeContradictionTarget = null) }
     }
+
+    /**
+     * Valide explicitement tous les personnages et ignore les contradictions
+     * pour un workflow plus rapide, puis passe à l'étape suivante.
+     */
+    fun validateAllCharacters() {
+        _uiState.value.characters.forEach { item ->
+            if (!item.entry.isValidatedInCanon) {
+                validateCharacter(item.entry.id, forceIgnoreContradictions = true)
+            }
+        }
+    }
 }

@@ -92,6 +92,7 @@ import java.io.File
 fun DialoguesScreen(
     projectId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToLettering: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DialoguesViewModel = viewModel(
         factory = DialoguesViewModel.Factory(
@@ -170,6 +171,28 @@ fun DialoguesScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (state.panels.isNotEmpty()) {
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = onNavigateToLettering,
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            Text("Continuer vers le Lettrage", modifier = Modifier.padding(8.dp))
+                        }
+                    }
+                }
+            }
         }
     ) { paddingValues ->
         Column(

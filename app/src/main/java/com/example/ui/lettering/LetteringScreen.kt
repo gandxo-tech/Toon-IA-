@@ -31,6 +31,8 @@ import java.io.File
 fun LetteringScreen(
     projectId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToReader: () -> Unit = {},
+
     viewModel: LetteringViewModel = viewModel(
         factory = LetteringViewModel.Factory(
             projectId = projectId,
@@ -56,6 +58,26 @@ fun LetteringScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             )
+        },
+        bottomBar = {
+            Surface(
+                shadowElevation = 8.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = onNavigateToReader,
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    ) {
+                        Text("Continuer vers la Lecture Verticale", modifier = Modifier.padding(8.dp))
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         if (uiState.panelsWithDialogues.isEmpty()) {

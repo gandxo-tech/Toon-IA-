@@ -83,6 +83,7 @@ import com.example.domain.model.WorldObjectEntry
 fun UniverseScreen(
     projectId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToNext: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: UniverseViewModel = viewModel()
 ) {
@@ -142,6 +143,31 @@ fun UniverseScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (state.worldBible != null || state.worldBible?.locations?.isNotEmpty() == true) {
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.validateAllUniverse()
+                                onNavigateToNext()
+                            },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            Text("Tout valider & Continuer vers l'Histoire", modifier = Modifier.padding(8.dp))
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         Column(

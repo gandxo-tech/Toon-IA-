@@ -235,6 +235,22 @@ class VisualHumorViewModel(
         _uiState.update { it.copy(visualError = null, humorError = null, successMessage = null) }
     }
 
+    /**
+     * Valide explicitement la direction artistique et l'humour, puis passe à l'étape suivante.
+     */
+    fun validateAllVisualHumor() {
+        _uiState.value.visualBible?.let {
+            if (!it.isValidatedInCanon) {
+                performValidateVisualBible(it)
+            }
+        }
+        _uiState.value.humorDna?.let {
+            if (!it.isValidatedInCanon) {
+                performValidateHumorDna(it)
+            }
+        }
+    }
+
     class Factory(
         private val useCase: VisualHumorUseCase,
         private val projectId: String

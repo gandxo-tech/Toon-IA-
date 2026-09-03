@@ -152,6 +152,31 @@ fun StoryScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (state.storyBible != null || state.storyBible?.timelineEvents?.isNotEmpty() == true) {
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.validateAllStory()
+                                onNavigateToVisualHumor?.invoke()
+                            },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            Text("Tout valider & Continuer vers la Dir. Artistique", modifier = Modifier.padding(8.dp))
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         Column(

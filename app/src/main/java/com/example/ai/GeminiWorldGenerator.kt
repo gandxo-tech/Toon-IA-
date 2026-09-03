@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Générateur IA pour la World Bible de ToonIA (Phase 5).
- * Utilise gemini-3.5-flash avec un schéma contraint JSON strict (responseSchema).
+ * Utilise gemini-3.6-flash avec un schéma contraint JSON strict (responseSchema).
  *
  * Règles absolues :
  * - Pas de simulation, vrai appel réseau.
@@ -34,7 +34,7 @@ class GeminiWorldGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.5-flash"
+        private const val MODEL_NAME = "gemini-3.6-flash"
     }
 
     /**

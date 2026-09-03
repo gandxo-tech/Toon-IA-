@@ -200,4 +200,21 @@ class StoryViewModel @JvmOverloads constructor(
     fun dismissFeedback() {
         _uiState.update { it.copy(generalFeedback = null) }
     }
+
+    /**
+     * Valide explicitement l'histoire et tous les événements, puis passe à l'étape suivante.
+     */
+    fun validateAllStory() {
+        val state = _uiState.value
+        state.storyBible?.let { bible ->
+            if (!bible.isValidatedInCanon) {
+                validateFullStoryBible(forceIgnoreContradictions = true)
+            }
+            bible.timelineEvents.forEach { event ->
+                if (!event.isValidatedInCanon) {
+                    validateTimelineEvent(event.id)
+                }
+            }
+        }
+    }
 }

@@ -225,4 +225,27 @@ class UniverseViewModel @JvmOverloads constructor(
     fun dismissFeedback() {
         _uiState.update { it.copy(generalFeedback = null) }
     }
+
+    /**
+     * Valide explicitement tous les éléments de l'univers et ignore les contradictions
+     * pour un workflow plus rapide, puis passe à l'étape suivante.
+     */
+    fun validateAllUniverse() {
+        val state = _uiState.value
+        state.worldBible?.let { bible ->
+            if (!bible.isValidatedInCanon) {
+                validateFullWorldBible(forceIgnoreContradictions = true)
+            }
+            bible.locations.forEach { loc ->
+                if (!loc.isValidatedInCanon) {
+                    validateLocation(loc.id, forceIgnoreContradictions = true)
+                }
+            }
+            bible.objects.forEach { obj ->
+                if (!obj.isValidatedInCanon) {
+                    validateObject(obj.id)
+                }
+            }
+        }
+    }
 }

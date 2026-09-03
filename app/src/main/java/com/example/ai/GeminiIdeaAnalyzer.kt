@@ -28,7 +28,7 @@ class GeminiIdeaAnalyzer(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.5-flash"
+        private const val MODEL_NAME = "gemini-3.6-flash"
     }
 
     /**
@@ -238,4 +238,8 @@ class GeminiIdeaAnalyzer(
 /**
  * Exception spécifique pour les erreurs retournées par l'API Gemini.
  */
-class GeminiApiException(val code: Int, override val message: String) : Exception(message)
+class GeminiApiException(val code: Int, override val message: String) : Exception(message) {
+    init {
+        ApiRateLimitManager.handleApiError(code, message)
+    }
+}

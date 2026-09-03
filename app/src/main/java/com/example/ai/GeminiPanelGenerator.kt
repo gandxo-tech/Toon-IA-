@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
  * Générateur IA pour la Phase 12 : Découpage d'une scène en Panels (cases de webtoon).
  *
  * RÈGLES DU PROMPT MAÎTRE :
- * 1. Modèle : gemini-3.5-flash avec schéma JSON contraint strict (responseSchema).
+ * 1. Modèle : gemini-3.6-flash avec schéma JSON contraint strict (responseSchema).
  * 2. Découpe la scène en une séquence ordonnée de panels verticaux.
  * 3. Chaque panel contient : personnages avec état actuel, lieu, action, émotion dominante,
  *    angle/plan caméra, composition, éclairage, arrière-plan, effets visuels (SFX visuels),
@@ -38,8 +38,8 @@ class GeminiPanelGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.5-flash"
-        private const val FALLBACK_MODEL_NAME = "gemini-2.5-flash"
+        private const val MODEL_NAME = "gemini-3.6-flash"
+        private const val FALLBACK_MODEL_NAME = "gemini-3.6-flash"
     }
 
     /**

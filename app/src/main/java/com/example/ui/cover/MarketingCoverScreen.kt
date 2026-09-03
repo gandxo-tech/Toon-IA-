@@ -149,6 +149,31 @@ fun MarketingCoverScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (uiState.selectedTitle?.isNotBlank() == true || uiState.proposalsResult?.synopsisVariants?.isNotEmpty() == true) {
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.validateAllMarketingCover()
+                                onNavigateToChapter()
+                            },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            Text("Tout valider & Continuer vers Chapitre", modifier = Modifier.padding(8.dp))
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         LazyColumn(
@@ -1078,7 +1103,7 @@ private fun CoverIllustrationSection(
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                             Text(
-                                text = "Appel au modèle Gemini (gemini-2.5-flash-image) et sauvegarde locale...",
+                                text = "Appel au modèle Gemini (gemini-3.1-flash-image) et sauvegarde locale...",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                             )

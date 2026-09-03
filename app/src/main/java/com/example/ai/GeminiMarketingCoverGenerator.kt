@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Générateur IA pour la Phase 8 : Titre, synopsis et description de couverture (Marketing).
- * Utilise gemini-2.5-flash avec schéma JSON contraint strict (responseSchema).
+ * Utilise gemini-3.6-flash avec schéma JSON contraint strict (responseSchema).
  *
  * RÈGLES D'OR DU PROMPT MAÎTRE :
  * 1. Utilisation de l'intégralité du canon actuel comme contexte (CanonSnapshot).
@@ -38,7 +38,7 @@ class GeminiMarketingCoverGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-2.5-flash"
+        private const val MODEL_NAME = "gemini-3.6-flash"
     }
 
     /**

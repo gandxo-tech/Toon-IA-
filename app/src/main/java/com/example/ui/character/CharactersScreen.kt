@@ -89,6 +89,7 @@ import com.example.domain.model.CharacterBibleEntry
 fun CharactersScreen(
     projectId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToNext: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: CharactersViewModel = viewModel()
 ) {
@@ -148,6 +149,31 @@ fun CharactersScreen(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
+        },
+        bottomBar = {
+            if (state.characters.isNotEmpty()) {
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                viewModel.validateAllCharacters()
+                                onNavigateToNext()
+                            },
+                            modifier = Modifier.fillMaxWidth(0.9f)
+                        ) {
+                            Text("Tout valider & Continuer vers l'Univers", modifier = Modifier.padding(8.dp))
+                        }
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         Column(

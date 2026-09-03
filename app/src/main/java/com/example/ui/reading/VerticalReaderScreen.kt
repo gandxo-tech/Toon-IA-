@@ -28,6 +28,8 @@ import java.io.File
 fun VerticalReaderScreen(
     projectId: String,
     onNavigateBack: () -> Unit,
+    onNavigateToExport: () -> Unit = {},
+
     viewModel: VerticalReaderViewModel = viewModel(
         factory = VerticalReaderViewModel.Factory(
             projectId = projectId,
@@ -51,6 +53,26 @@ fun VerticalReaderScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
             )
+        },
+        bottomBar = {
+            Surface(
+                shadowElevation = 8.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = onNavigateToExport,
+                        modifier = Modifier.fillMaxWidth(0.9f)
+                    ) {
+                        Text("Continuer vers l0027Exportation", modifier = Modifier.padding(8.dp))
+                    }
+                }
+            }
         }
     ) { innerPadding ->
         if (uiState.panelsWithDialogues.isEmpty()) {
