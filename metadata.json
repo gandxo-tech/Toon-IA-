@@ -1,0 +1,6 @@
+{
+  "name": "ToonIA",
+  "description": "Application de création et de lecture de webtoons assistée par IA",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

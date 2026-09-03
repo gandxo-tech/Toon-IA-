@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">ToonIA</string>
+    <string name="title_home">Accueil</string>
+    <string name="title_new_project">Nouveau Projet</string>
+    <string name="title_characters">Personnages</string>
+    <string name="title_universe">Univers</string>
+    <string name="title_story">Histoire</string>
+    <string name="title_chapter">Chapitre</string>
+    <string name="title_storyboard">Storyboard</string>
+    <string name="title_panels">Panels</string>
+    <string name="title_dialogues">Dialogues</string>
+    <string name="title_cover">Couverture</string>
+    <string name="title_vertical_reader">Lecture Verticale</string>
+    <string name="title_export">Export</string>
+    
+    <string name="no_projects_title">Aucun projet</string>
+    <string name="no_projects_desc">Commencez par créer votre premier webtoon avec ToonIA.</string>
+    <string name="btn_new_project">Nouveau projet</string>
+    <string name="btn_back">Retour</string>
+    <string name="section_workflow_title">Modules &amp; Écrans de création</string>
+</resources>
