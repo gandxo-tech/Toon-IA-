@@ -39,7 +39,7 @@ data class StoryUiState(
     val manualEventEpoch: String = ""
 )
 
-class StoryViewModel(
+class StoryViewModel @JvmOverloads constructor(
     application: Application,
     private val useCaseOverride: StoryBibleUseCase? = null
 ) : AndroidViewModel(application) {

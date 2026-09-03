@@ -3,6 +3,8 @@ package com.example.ui.project
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ai.GeminiIdeaAnalyzer
+import com.example.util.ApiKeyManager
 import com.example.data.local.ToonDatabase
 import com.example.data.local.entity.GenerationJobEntity
 import com.example.data.local.entity.JobStatus
@@ -36,15 +38,17 @@ data class NewProjectUiState(
     val isValidated: Boolean = false
 )
 
-class NewProjectViewModel(
+class NewProjectViewModel @JvmOverloads constructor(
     application: Application,
-    private val useCase: AnalyzeIdeaUseCase = AnalyzeIdeaUseCase(
-        projectDao = ToonDatabase.getInstance(application).projectDao(),
-        jobDao = ToonDatabase.getInstance(application).generationJobDao()
-    )
+    private val useCaseOverride: AnalyzeIdeaUseCase? = null
 ) : AndroidViewModel(application) {
 
     private val db = ToonDatabase.getInstance(application)
+    private val useCase: AnalyzeIdeaUseCase = useCaseOverride ?: AnalyzeIdeaUseCase(
+        projectDao = db.projectDao(),
+        jobDao = db.generationJobDao(),
+        geminiAnalyzer = GeminiIdeaAnalyzer(apiKeyOverride = ApiKeyManager.getApiKey(application))
+    )
     private val _uiState = MutableStateFlow(NewProjectUiState())
     val uiState: StateFlow<NewProjectUiState> = _uiState.asStateFlow()
 

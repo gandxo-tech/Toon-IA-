@@ -39,7 +39,7 @@ data class UniverseUiState(
     val manualLocationAtmosphere: String = ""
 )
 
-class UniverseViewModel(
+class UniverseViewModel @JvmOverloads constructor(
     application: Application,
     private val useCaseOverride: WorldBibleUseCase? = null
 ) : AndroidViewModel(application) {

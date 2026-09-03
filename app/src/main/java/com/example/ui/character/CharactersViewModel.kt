@@ -3,12 +3,14 @@ package com.example.ui.character
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ai.GeminiCharacterGenerator
 import com.example.data.local.ToonDatabase
 import com.example.data.local.entity.GenerationJobEntity
 import com.example.data.repository.CanonMemoryRepositoryImpl
 import com.example.domain.canon.Contradiction
 import com.example.domain.model.CharacterBibleEntry
 import com.example.domain.usecase.CharacterBibleUseCase
+import com.example.util.ApiKeyManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,18 +48,21 @@ data class CharactersScreenUiState(
     val generalFeedback: String? = null
 )
 
-class CharactersViewModel(
+class CharactersViewModel @JvmOverloads constructor(
     application: Application,
-    private val useCase: CharacterBibleUseCase = CharacterBibleUseCase(
-        projectDao = ToonDatabase.getInstance(application).projectDao(),
-        jobDao = ToonDatabase.getInstance(application).generationJobDao(),
-        characterDao = ToonDatabase.getInstance(application).characterDao(),
-        characterStateDao = ToonDatabase.getInstance(application).characterStateDao(),
-        canonRepository = CanonMemoryRepositoryImpl(ToonDatabase.getInstance(application))
-    )
+    private val useCaseOverride: CharacterBibleUseCase? = null
 ) : AndroidViewModel(application) {
 
     private val db = ToonDatabase.getInstance(application)
+    private val useCase: CharacterBibleUseCase = useCaseOverride ?: CharacterBibleUseCase(
+        projectDao = db.projectDao(),
+        jobDao = db.generationJobDao(),
+        characterDao = db.characterDao(),
+        characterStateDao = db.characterStateDao(),
+        canonRepository = CanonMemoryRepositoryImpl(db),
+        generator = GeminiCharacterGenerator(apiKeyOverride = ApiKeyManager.getApiKey(application))
+    )
+
     private val _uiState = MutableStateFlow(CharactersScreenUiState())
     val uiState: StateFlow<CharactersScreenUiState> = _uiState.asStateFlow()
 
