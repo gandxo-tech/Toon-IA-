@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Générateur IA pour la Visual Bible et la Humor DNA de ToonIA (Phase 7).
- * Utilise gemini-3.6-flash avec un schéma JSON contraint strict (responseSchema).
+ * Utilise gemini-1.5-flash avec un schéma JSON contraint strict (responseSchema).
  *
  * Contraintes absolues du Prompt Maître :
  * - Canon complet en contexte (Personnages validés, Univers validé, Story Bible validée).
@@ -35,7 +35,7 @@ class GeminiVisualHumorGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.6-flash"
+        private const val MODEL_NAME = "gemini-1.5-flash"
     }
 
     /**
@@ -48,9 +48,9 @@ class GeminiVisualHumorGenerator(
         projectTone: String?,
         canonSnapshot: CanonSnapshot
     ): VisualBibleResult = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )
@@ -84,9 +84,9 @@ class GeminiVisualHumorGenerator(
         projectTone: String?,
         canonSnapshot: CanonSnapshot
     ): HumorDnaResult = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )
@@ -393,7 +393,7 @@ class GeminiVisualHumorGenerator(
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string() ?: "Aucun détail"
-                throw IOException("Échec de la requête Gemini (${response.code}) : $errorBody")
+                throw GeminiApiException(response.code, "Échec de la requête Gemini (${response.code}) : $errorBody")
             }
 
             val bodyString = response.body?.string()
@@ -419,7 +419,7 @@ class GeminiVisualHumorGenerator(
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string() ?: "Aucun détail"
-                throw IOException("Échec de la requête Gemini (${response.code}) : $errorBody")
+                throw GeminiApiException(response.code, "Échec de la requête Gemini (${response.code}) : $errorBody")
             }
 
             val bodyString = response.body?.string()

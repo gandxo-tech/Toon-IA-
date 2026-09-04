@@ -47,7 +47,7 @@ class NewProjectViewModel @JvmOverloads constructor(
     private val useCase: AnalyzeIdeaUseCase = useCaseOverride ?: AnalyzeIdeaUseCase(
         projectDao = db.projectDao(),
         jobDao = db.generationJobDao(),
-        geminiAnalyzer = GeminiIdeaAnalyzer(apiKeyOverride = ApiKeyManager.getApiKey(application))
+        geminiAnalyzer = GeminiIdeaAnalyzer()
     )
     private val _uiState = MutableStateFlow(NewProjectUiState())
     val uiState: StateFlow<NewProjectUiState> = _uiState.asStateFlow()

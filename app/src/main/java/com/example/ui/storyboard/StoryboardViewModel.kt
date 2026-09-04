@@ -226,7 +226,7 @@ class StoryboardViewModel(
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val db = ToonDatabase.getInstance(context)
                 val canonRepo = CanonMemoryRepositoryImpl(db)
-                val detailGenerator = GeminiSceneDetailGenerator(apiKeyOverride = ApiKeyManager.getApiKey(context))
+                val detailGenerator = GeminiSceneDetailGenerator()
                 val useCase = StoryboardUseCase(
                     chapterDao = db.chapterDao(),
                     sceneDao = db.sceneDao(),

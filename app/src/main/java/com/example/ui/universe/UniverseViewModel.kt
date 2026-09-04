@@ -54,7 +54,7 @@ class UniverseViewModel @JvmOverloads constructor(
         locationDao = db.locationDao(),
         storyObjectDao = db.storyObjectDao(),
         canonRepository = canonRepo,
-        generator = GeminiWorldGenerator(apiKeyOverride = ApiKeyManager.getApiKey(application))
+        generator = GeminiWorldGenerator()
     )
 
     private val _uiState = MutableStateFlow(UniverseUiState())

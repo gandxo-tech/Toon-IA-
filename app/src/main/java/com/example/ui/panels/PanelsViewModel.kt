@@ -313,8 +313,8 @@ class PanelsViewModel(
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 val db = ToonDatabase.getInstance(context)
                 val canonRepo = CanonMemoryRepositoryImpl(db)
-                val panelGenerator = GeminiPanelGenerator(apiKeyOverride = ApiKeyManager.getApiKey(context))
-                val visualPanelGenerator = GeminiVisualPanelGenerator(apiKeyOverride = ApiKeyManager.getApiKey(context))
+                val panelGenerator = GeminiPanelGenerator()
+                val visualPanelGenerator = GeminiVisualPanelGenerator()
                 val useCase = PanelUseCase(
                     chapterDao = db.chapterDao(),
                     sceneDao = db.sceneDao(),

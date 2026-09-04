@@ -53,7 +53,7 @@ class StoryViewModel @JvmOverloads constructor(
         storyBibleDao = db.storyBibleDao(),
         timelineEventDao = db.timelineEventDao(),
         canonRepository = canonRepo,
-        generator = GeminiStoryGenerator(apiKeyOverride = ApiKeyManager.getApiKey(application))
+        generator = GeminiStoryGenerator()
     )
 
     private val _uiState = MutableStateFlow(StoryUiState())

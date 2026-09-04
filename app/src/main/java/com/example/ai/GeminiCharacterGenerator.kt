@@ -34,7 +34,7 @@ class GeminiCharacterGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.6-flash"
+        private const val MODEL_NAME = "gemini-1.5-flash"
     }
 
     /**
@@ -47,9 +47,9 @@ class GeminiCharacterGenerator(
         projectTone: String?,
         canonSnapshot: CanonSnapshot
     ): CharacterBibleResult = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )
@@ -84,9 +84,9 @@ class GeminiCharacterGenerator(
         projectSynopsis: String,
         canonSnapshot: CanonSnapshot
     ): CharacterBibleEntry = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )

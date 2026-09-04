@@ -743,7 +743,7 @@ fun createDefaultChapterViewModel(projectId: String): ChapterViewModel {
     val db = ToonDatabase.getInstance(context)
     val canonRepo = CanonMemoryRepositoryImpl(db)
     val detector = CanonContradictionDetector()
-    val generator = GeminiChapterScriptGenerator(apiKeyOverride = ApiKeyManager.getApiKey(context))
+    val generator = GeminiChapterScriptGenerator()
     val useCase = ChapterScriptUseCase(
         projectDao = db.projectDao(),
         chapterDao = db.chapterDao(),

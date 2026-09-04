@@ -60,7 +60,7 @@ class CharactersViewModel @JvmOverloads constructor(
         characterDao = db.characterDao(),
         characterStateDao = db.characterStateDao(),
         canonRepository = CanonMemoryRepositoryImpl(db),
-        generator = GeminiCharacterGenerator(apiKeyOverride = ApiKeyManager.getApiKey(application))
+        generator = GeminiCharacterGenerator()
     )
 
     private val _uiState = MutableStateFlow(CharactersScreenUiState())

@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit
  * Générateur d'image pour la Phase 9 : Image de couverture de ToonIA.
  *
  * RÈGLES DU PROMPT MAÎTRE & SPÉCIFICATIONS :
- * 1. Modèle d'image Gemini : gemini-3.1-flash-image (spécifié dans gemini-api skill)
- *    avec fallback sur imagen-3.0-generate-002 si indisponible.
+ * 1. Modèle d'image Gemini : gemini-1.5-flash (spécifié dans gemini-api skill)
+ *    avec fallback sur imagen-3.0-generate-001 si indisponible.
  * 2. Prompt construit à partir de la description de couverture validée en Phase 8 + Visual Bible.
  * 3. RÈGLE STRICTE : AUCUN TEXTE dans l'image. Tout texte (titre, auteur, tagline) est
  *    superposé nativement par Compose, jamais généré dans l'illustration.
@@ -45,9 +45,9 @@ class GeminiCoverImageGenerator(
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
         // Modèle officiel Gemini pour la génération d'images (gemini-api skill)
-        const val PRIMARY_IMAGE_MODEL = "gemini-3.1-flash-image"
-        // Modèle de secours si gemini-3.1-flash-image n'est pas activé sur le projet
-        const val FALLBACK_IMAGE_MODEL = "imagen-3.0-generate-002"
+        const val PRIMARY_IMAGE_MODEL = "gemini-1.5-flash"
+        // Modèle de secours si gemini-1.5-flash n'est pas activé sur le projet
+        const val FALLBACK_IMAGE_MODEL = "imagen-3.0-generate-001"
     }
 
     /**
@@ -62,9 +62,9 @@ class GeminiCoverImageGenerator(
         visualBible: VisualBibleEntity?,
         canonSnapshot: CanonSnapshot
     ): String = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )
@@ -79,7 +79,7 @@ class GeminiCoverImageGenerator(
         // Récupérer d'éventuelles images de référence de personnages canoniques (Phase 14 optionnelle)
         val referenceImagesBase64 = loadCanonicalCharacterReferenceImages(canonSnapshot)
 
-        // Tentative 1 : Modèle officiel Gemini gemini-3.1-flash-image
+        // Tentative 1 : Modèle officiel Gemini gemini-1.5-flash
         try {
             val imageBytes = callGeminiFlashImage(
                 apiKey = apiKey,
@@ -169,7 +169,7 @@ class GeminiCoverImageGenerator(
     }
 
     /**
-     * Effectue l'appel à gemini-3.1-flash-image avec responseModalities = ["TEXT", "IMAGE"].
+     * Effectue l'appel à gemini-1.5-flash avec responseModalities = ["TEXT", "IMAGE"].
      */
     private suspend fun callGeminiFlashImage(
         apiKey: String,
@@ -223,7 +223,7 @@ class GeminiCoverImageGenerator(
     }
 
     /**
-     * Fallback sur imagen-3.0-generate-002 si le modèle flash-image n'est pas disponible.
+     * Fallback sur imagen-3.0-generate-001 si le modèle flash-image n'est pas disponible.
      */
     private suspend fun callImagenFallback(
         apiKey: String,
@@ -265,7 +265,7 @@ class GeminiCoverImageGenerator(
 
         if (!response.isSuccessful) {
             val errorMsg = parseErrorMessage(responseBody, response.code)
-            throw IOException(errorMsg)
+            throw GeminiApiException(response.code, errorMsg)
         }
 
         val json = try {
@@ -326,7 +326,7 @@ class GeminiCoverImageGenerator(
 
         if (!response.isSuccessful) {
             val errorMsg = parseErrorMessage(responseBody, response.code)
-            throw IOException(errorMsg)
+            throw GeminiApiException(response.code, errorMsg)
         }
 
         val json = JSONObject(responseBody)

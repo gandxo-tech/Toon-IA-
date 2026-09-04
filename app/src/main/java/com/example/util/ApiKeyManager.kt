@@ -6,9 +6,15 @@ import com.example.BuildConfig
 object ApiKeyManager {
     private const val PREF_NAME = "toonia_prefs"
     private const val KEY_GEMINI_API_KEY = "gemini_api_key"
+    private var appContext: Context? = null
 
-    fun getApiKey(context: Context): String {
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
+
+    fun getApiKey(context: Context? = null): String {
+        val ctx = context ?: appContext ?: return ""
+        val prefs = ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val savedKey = prefs.getString(KEY_GEMINI_API_KEY, null)
         if (!savedKey.isNullOrBlank()) {
             return savedKey

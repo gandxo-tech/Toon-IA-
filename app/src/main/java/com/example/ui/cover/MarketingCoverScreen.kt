@@ -948,7 +948,7 @@ fun createDefaultMarketingCoverViewModel(projectId: String): MarketingCoverViewM
     val context = LocalContext.current
     val db = ToonDatabase.getInstance(context)
     val canonRepo = CanonMemoryRepositoryImpl(db)
-    val generator = GeminiMarketingCoverGenerator(apiKeyOverride = ApiKeyManager.getApiKey(context))
+    val generator = GeminiMarketingCoverGenerator()
     val useCase = MarketingCoverUseCase(
         projectDao = db.projectDao(),
         coverDao = db.coverDao(),
@@ -956,7 +956,7 @@ fun createDefaultMarketingCoverViewModel(projectId: String): MarketingCoverViewM
         canonRepository = canonRepo,
         generator = generator
     )
-    val imageGenerator = GeminiCoverImageGenerator(apiKeyOverride = ApiKeyManager.getApiKey(context))
+    val imageGenerator = GeminiCoverImageGenerator()
     val imageUseCase = GenerateCoverImageUseCase(
         projectDao = db.projectDao(),
         coverDao = db.coverDao(),

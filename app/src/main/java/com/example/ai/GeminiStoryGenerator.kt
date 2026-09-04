@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Générateur IA pour la Story Bible de ToonIA (Phase 6).
- * Utilise gemini-3.6-flash avec un schéma contraint JSON strict (responseSchema).
+ * Utilise gemini-1.5-flash avec un schéma contraint JSON strict (responseSchema).
  *
  * Prérequis et contraintes absolues :
  * - Canon complet actuel en contexte (personnages validés + univers validé : règles, factions, lieux, objets).
@@ -33,7 +33,7 @@ class GeminiStoryGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.6-flash"
+        private const val MODEL_NAME = "gemini-1.5-flash"
     }
 
     /**
@@ -46,9 +46,9 @@ class GeminiStoryGenerator(
         projectTone: String?,
         canonSnapshot: CanonSnapshot
     ): StoryBibleResult = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )

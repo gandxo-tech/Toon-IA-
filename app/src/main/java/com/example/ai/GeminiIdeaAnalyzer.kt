@@ -28,7 +28,7 @@ class GeminiIdeaAnalyzer(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-3.6-flash"
+        private const val MODEL_NAME = "gemini-1.5-flash"
     }
 
     /**
@@ -42,9 +42,9 @@ class GeminiIdeaAnalyzer(
         freeIdeaText: String,
         advancedDetails: AdvancedIdeaDetails? = null
     ): IdeaAnalysisResult = withContext(Dispatchers.IO) {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
 
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             throw IllegalStateException(
                 "Clé API Gemini non configurée. Veuillez ajouter votre clé API Gemini dans le panneau Secrets d'AI Studio."
             )
@@ -232,14 +232,5 @@ class GeminiIdeaAnalyzer(
         }
 
         return parts.getJSONObject(0).getString("text")
-    }
-}
-
-/**
- * Exception spécifique pour les erreurs retournées par l'API Gemini.
- */
-class GeminiApiException(val code: Int, override val message: String) : Exception(message) {
-    init {
-        ApiRateLimitManager.handleApiError(code, message)
     }
 }

@@ -37,7 +37,7 @@ class GeminiDialogueGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        const val PRIMARY_MODEL = "gemini-3.6-flash"
+        const val PRIMARY_MODEL = "gemini-1.5-flash"
     }
 
     /**
@@ -77,8 +77,8 @@ class GeminiDialogueGenerator(
         promptText: String,
         canonSnapshot: CanonSnapshot
     ): List<DialogueEntity> {
-        val apiKey = apiKeyOverride ?: BuildConfig.GEMINI_API_KEY
-        if (apiKey.isNullOrBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        val apiKey = apiKeyOverride ?: com.example.util.ApiKeyManager.getApiKey()
+        if (apiKey.isBlank()) {
             throw IllegalStateException("Clé API Gemini non configurée. Veuillez renseigner votre clé API dans le panneau Secrets.")
         }
 
