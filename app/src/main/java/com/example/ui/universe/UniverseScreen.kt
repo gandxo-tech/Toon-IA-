@@ -88,6 +88,7 @@ fun UniverseScreen(
     viewModel: UniverseViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val rateLimitCountdown by com.example.ai.ApiRateLimitManager.rateLimitCountdown.collectAsState(initial = 0)
 
     LaunchedEffect(projectId) {
         if (projectId.isNotBlank()) {
@@ -195,7 +196,8 @@ fun UniverseScreen(
                         isWorldValidated = state.worldBible?.isValidatedInCanon == true,
                         onGenerateWorld = { viewModel.generateWorldBible() },
                         onValidateWorld = { viewModel.validateFullWorldBible() },
-                        onAddLocation = { viewModel.showAddLocationDialog(true) }
+                        onAddLocation = { viewModel.showAddLocationDialog(true) },
+                        rateLimitCountdown = rateLimitCountdown
                     )
                 }
 
@@ -203,6 +205,7 @@ fun UniverseScreen(
                 if (world == null && state.status !is WorldGenerationUiStatus.Running) {
                     item {
                         EmptyUniversePlaceholder(
+                            rateLimitCountdown = rateLimitCountdown,
                             onGenerateClicked = { viewModel.generateWorldBible() }
                         )
                     }
@@ -417,7 +420,8 @@ private fun GlobalUniverseActionCard(
     isWorldValidated: Boolean,
     onGenerateWorld: () -> Unit,
     onValidateWorld: () -> Unit,
-    onAddLocation: () -> Unit
+    onAddLocation: () -> Unit,
+    rateLimitCountdown: Int
 ) {
     Card(
         modifier = Modifier
@@ -465,7 +469,7 @@ private fun GlobalUniverseActionCard(
             ) {
                 Button(
                     onClick = onGenerateWorld,
-                    enabled = status !is WorldGenerationUiStatus.Running,
+                    enabled = status !is WorldGenerationUiStatus.Running && rateLimitCountdown == 0,
                     modifier = Modifier
                         .weight(1.2f)
                         .testTag("btn_generate_universe")
@@ -630,7 +634,10 @@ private fun ObjectCard(
 }
 
 @Composable
-private fun EmptyUniversePlaceholder(onGenerateClicked: () -> Unit) {
+private fun EmptyUniversePlaceholder(
+    onGenerateClicked: () -> Unit,
+    rateLimitCountdown: Int
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
@@ -645,7 +652,10 @@ private fun EmptyUniversePlaceholder(onGenerateClicked: () -> Unit) {
             Spacer(modifier = Modifier.height(4.dp))
             Text("Générez la World Bible pour concevoir les règles, factions, lore et lieux.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onGenerateClicked) {
+            Button(
+                onClick = onGenerateClicked,
+                enabled = rateLimitCountdown == 0
+            ) {
                 Text("Générer l'univers maintenant")
             }
         }

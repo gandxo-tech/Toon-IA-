@@ -94,6 +94,7 @@ fun VisualHumorScreen(
     viewModel: VisualHumorViewModel = createDefaultVisualHumorViewModel(projectId)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val rateLimitCountdown by com.example.ai.ApiRateLimitManager.rateLimitCountdown.collectAsState(initial = 0)
 
     Scaffold(
         modifier = modifier

@@ -94,6 +94,7 @@ fun CharactersScreen(
     viewModel: CharactersViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val rateLimitCountdown by com.example.ai.ApiRateLimitManager.rateLimitCountdown.collectAsState(initial = 0)
 
     LaunchedEffect(projectId) {
         if (projectId.isNotBlank()) {
@@ -199,6 +200,7 @@ fun CharactersScreen(
                 // Section En-tête / Action globale IA
                 item {
                     GlobalActionCard(
+                        rateLimitCountdown = rateLimitCountdown,
                         status = state.status,
                         characterCount = state.characters.size,
                         validatedCount = state.characters.count { it.entry.isValidatedInCanon },
@@ -211,6 +213,7 @@ fun CharactersScreen(
                 if (state.characters.isEmpty() && state.status !is CharacterGenerationUiStatus.Running) {
                     item {
                         EmptyCharactersPlaceholder(
+                            rateLimitCountdown = rateLimitCountdown,
                             onGenerateClicked = { viewModel.generateCharacters() },
                             onAddManualClicked = { viewModel.showManualAddDialog(true) }
                         )
@@ -270,6 +273,7 @@ fun CharactersScreen(
 
 @Composable
 private fun GlobalActionCard(
+    rateLimitCountdown: Int,
     status: CharacterGenerationUiStatus,
     characterCount: Int,
     validatedCount: Int,
@@ -316,7 +320,7 @@ private fun GlobalActionCard(
             ) {
                 Button(
                     onClick = onGenerateAll,
-                    enabled = status !is CharacterGenerationUiStatus.Running,
+                    enabled = status !is CharacterGenerationUiStatus.Running && rateLimitCountdown == 0,
                     modifier = Modifier
                         .weight(1f)
                         .testTag("btn_generate_all_characters")
@@ -920,7 +924,8 @@ private fun SingleRegenGuidanceDialog(
 @Composable
 private fun EmptyCharactersPlaceholder(
     onGenerateClicked: () -> Unit,
-    onAddManualClicked: () -> Unit
+    onAddManualClicked: () -> Unit,
+    rateLimitCountdown: Int
 ) {
     Card(
         modifier = Modifier
@@ -956,7 +961,7 @@ private fun EmptyCharactersPlaceholder(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Button(onClick = onGenerateClicked) {
+                Button(onClick = onGenerateClicked, enabled = rateLimitCountdown == 0) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Générer avec l'IA")

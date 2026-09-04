@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -85,6 +88,7 @@ fun ToonApp(
     }
 
     val rateLimitCountdown by com.example.ai.ApiRateLimitManager.rateLimitCountdown.collectAsState(initial = 0)
+    val lastError by com.example.ai.ApiRateLimitManager.lastErrorMessage.collectAsState(initial = null)
 
     Box(modifier = modifier.fillMaxSize()) {
         NavHost(
@@ -229,11 +233,22 @@ fun ToonApp(
                 shadowElevation = 8.dp,
                 shape = RoundedCornerShape(8.dp),
             ) {
-                Text(
-                    text = "Limite d'API atteinte. Revenez dans $rateLimitCountdown secondes.",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Limite d'API atteinte. Revenez dans $rateLimitCountdown secondes.",
+                        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    lastError?.let {
+                        Text(
+                            text = it,
+                            modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
         }
     }

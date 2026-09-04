@@ -85,6 +85,7 @@ fun StoryScreen(
     viewModel: StoryViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val rateLimitCountdown by com.example.ai.ApiRateLimitManager.rateLimitCountdown.collectAsState(initial = 0)
 
     LaunchedEffect(projectId) {
         if (projectId.isNotBlank()) {
@@ -212,7 +213,7 @@ fun StoryScreen(
                 val story = state.storyBible
                 if (story == null && state.status !is StoryGenerationUiStatus.Running) {
                     item {
-                        EmptyStoryPlaceholder(
+                        EmptyStoryPlaceholder(rateLimitCountdown = rateLimitCountdown, 
                             onGenerateClicked = { viewModel.generateStoryBible() }
                         )
                     }
@@ -611,7 +612,10 @@ private fun TimelineEventCard(
 }
 
 @Composable
-private fun EmptyStoryPlaceholder(onGenerateClicked: () -> Unit) {
+private fun EmptyStoryPlaceholder(
+    onGenerateClicked: () -> Unit,
+    rateLimitCountdown: Int
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
@@ -626,7 +630,7 @@ private fun EmptyStoryPlaceholder(onGenerateClicked: () -> Unit) {
             Spacer(modifier = Modifier.height(4.dp))
             Text("Générez la Story Bible pour structurer la prémisse, les thèmes, les conflits et la chronologie.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onGenerateClicked) {
+            Button(onClick = onGenerateClicked, enabled = rateLimitCountdown == 0) {
                 Text("Générer l'histoire maintenant")
             }
         }
