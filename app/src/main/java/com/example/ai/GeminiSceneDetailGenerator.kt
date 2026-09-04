@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
  * Générateur IA pour la Phase 11 : Enrichissement détaillé d'une scène au Storyboard.
  *
  * RÈGLES DU PROMPT MAÎTRE :
- * 1. Modèle : gemini-1.5-flash avec schéma JSON contraint strict (responseSchema).
+ * 1. Modèle : gemini-3.1-flash-lite-preview avec schéma JSON contraint strict (responseSchema).
  * 2. Injection obligatoire du CanonSnapshot (personnages, univers, DA, ton, règles du monde).
  * 3. Approfondit le rythme (pacing), l'arc émotionnel et les micro-beats narratifs d'une scène précise,
  *    SANS encore descendre au niveau panel (réservé à la Phase 12).
@@ -35,8 +35,8 @@ class GeminiSceneDetailGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-1.5-flash"
-        private const val FALLBACK_MODEL_NAME = "gemini-1.5-flash"
+        private const val MODEL_NAME = "gemini-3.1-flash-lite-preview"
+        private const val FALLBACK_MODEL_NAME = "gemini-3.1-flash-lite-preview"
     }
 
     /**

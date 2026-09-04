@@ -37,7 +37,7 @@ class GeminiDialogueGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        const val PRIMARY_MODEL = "gemini-1.5-flash"
+        const val PRIMARY_MODEL = "gemini-3.1-flash-lite-preview"
     }
 
     /**

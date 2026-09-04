@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
  * Générateur IA pour la Phase 10 : Script du Chapitre 1 de ToonIA.
  *
  * RÈGLES DU PROMPT MAÎTRE :
- * 1. Modèle : gemini-1.5-flash avec schéma JSON contraint strict (responseSchema).
+ * 1. Modèle : gemini-3.1-flash-lite-preview avec schéma JSON contraint strict (responseSchema).
  * 2. Injection obligatoire de l'intégralité du Canon validé (getCanonSnapshot).
  * 3. Cohérence narrative stricte : respect des personnages, lieux et règles de la Story/World Bible.
  * 4. Pacing adapté au webtoon (rythme vertical, accroche percutante, cliffhanger de fin de chapitre).
@@ -36,8 +36,8 @@ class GeminiChapterScriptGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-1.5-flash"
-        private const val FALLBACK_MODEL_NAME = "gemini-1.5-flash"
+        private const val MODEL_NAME = "gemini-3.1-flash-lite-preview"
+        private const val FALLBACK_MODEL_NAME = "gemini-3.1-flash-lite-preview"
     }
 
     /**
@@ -66,7 +66,7 @@ class GeminiChapterScriptGenerator(
         try {
             executeRequest(MODEL_NAME, apiKey, requestBodyJson)
         } catch (e: Exception) {
-            // Fallback sur gemini-1.5-flash si le modèle 3.5 renvoie 404
+            // Fallback sur gemini-3.1-flash-lite-preview si le modèle 3.5 renvoie 404
             if (e.message?.contains("404") == true || e.message?.contains("not found", ignoreCase = true) == true) {
                 executeRequest(FALLBACK_MODEL_NAME, apiKey, requestBodyJson)
             } else {

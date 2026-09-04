@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
  * Générateur d'image pour la Phase 9 : Image de couverture de ToonIA.
  *
  * RÈGLES DU PROMPT MAÎTRE & SPÉCIFICATIONS :
- * 1. Modèle d'image Gemini : gemini-1.5-flash (spécifié dans gemini-api skill)
+ * 1. Modèle d'image Gemini : gemini-3.1-flash-lite-preview (spécifié dans gemini-api skill)
  *    avec fallback sur imagen-3.0-generate-001 si indisponible.
  * 2. Prompt construit à partir de la description de couverture validée en Phase 8 + Visual Bible.
  * 3. RÈGLE STRICTE : AUCUN TEXTE dans l'image. Tout texte (titre, auteur, tagline) est
@@ -45,8 +45,8 @@ class GeminiCoverImageGenerator(
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
         // Modèle officiel Gemini pour la génération d'images (gemini-api skill)
-        const val PRIMARY_IMAGE_MODEL = "gemini-1.5-flash"
-        // Modèle de secours si gemini-1.5-flash n'est pas activé sur le projet
+        const val PRIMARY_IMAGE_MODEL = "gemini-3.1-flash-lite-preview"
+        // Modèle de secours si gemini-3.1-flash-lite-preview n'est pas activé sur le projet
         const val FALLBACK_IMAGE_MODEL = "imagen-3.0-generate-001"
     }
 
@@ -79,7 +79,7 @@ class GeminiCoverImageGenerator(
         // Récupérer d'éventuelles images de référence de personnages canoniques (Phase 14 optionnelle)
         val referenceImagesBase64 = loadCanonicalCharacterReferenceImages(canonSnapshot)
 
-        // Tentative 1 : Modèle officiel Gemini gemini-1.5-flash
+        // Tentative 1 : Modèle officiel Gemini gemini-3.1-flash-lite-preview
         try {
             val imageBytes = callGeminiFlashImage(
                 apiKey = apiKey,
@@ -169,7 +169,7 @@ class GeminiCoverImageGenerator(
     }
 
     /**
-     * Effectue l'appel à gemini-1.5-flash avec responseModalities = ["TEXT", "IMAGE"].
+     * Effectue l'appel à gemini-3.1-flash-lite-preview avec responseModalities = ["TEXT", "IMAGE"].
      */
     private suspend fun callGeminiFlashImage(
         apiKey: String,

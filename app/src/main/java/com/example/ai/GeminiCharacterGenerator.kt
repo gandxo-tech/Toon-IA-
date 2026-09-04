@@ -34,7 +34,7 @@ class GeminiCharacterGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        private const val MODEL_NAME = "gemini-1.5-flash"
+        private const val MODEL_NAME = "gemini-3.1-flash-lite-preview"
     }
 
     /**

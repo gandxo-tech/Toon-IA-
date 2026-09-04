@@ -33,7 +33,7 @@ data class PanelImageGenerationResult(
  * Générateur d'illustrations pour les panels de ToonIA (Phase 14).
  *
  * RÈGLES MAÎTRES & SPÉCIFICATIONS :
- * 1. Modèle d'image Gemini : gemini-1.5-flash (avec fallback imagen-3.0-generate-001 si indisponible).
+ * 1. Modèle d'image Gemini : gemini-3.1-flash-lite-preview (avec fallback imagen-3.0-generate-001 si indisponible).
  * 2. Avant de générer un panel : si un personnage présent n'a pas encore d'image de référence canonique,
  *    génère d'abord une image de référence de ce personnage seul (Character Bible + Visual Bible)
  *    et enregistre-la de façon pérenne dans le profil du personnage.
@@ -53,7 +53,7 @@ class GeminiVisualPanelGenerator(
 ) {
     companion object {
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
-        const val PRIMARY_IMAGE_MODEL = "gemini-1.5-flash"
+        const val PRIMARY_IMAGE_MODEL = "gemini-3.1-flash-lite-preview"
         const val FALLBACK_IMAGE_MODEL = "imagen-3.0-generate-001"
     }
 
@@ -224,7 +224,7 @@ class GeminiVisualPanelGenerator(
     }
 
     /**
-     * Appelle gemini-1.5-flash pour générer l'image.
+     * Appelle gemini-3.1-flash-lite-preview pour générer l'image.
      */
     private suspend fun callGeminiFlashImage(
         apiKey: String,
@@ -303,7 +303,7 @@ class GeminiVisualPanelGenerator(
             }
         }
 
-        throw IOException("Aucune donnée d'image (inlineData) trouvée dans la réponse de gemini-1.5-flash.")
+        throw IOException("Aucune donnée d'image (inlineData) trouvée dans la réponse de gemini-3.1-flash-lite-preview.")
     }
 
     /**
