@@ -455,8 +455,9 @@
     }
   }
 
-  async function callGemini(prompt, schema, temperature) {
-    if (AI.server.checked && !AI.hasServerKey()) throw new Error(NO_KEY_MESSAGE);
+  function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+  async function callGeminiOnce(prompt, schema, temperature) {
     const model = T.state.settings.model || AI.server.model || 'gemini-3.1-flash-lite-preview';
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 90000);
@@ -487,6 +488,29 @@
       throw err;
     }
     return extractJson(data);
+  }
+
+  // La génération complète enchaîne une vingtaine d'appels : le quota Gemini
+  // est limité par minute, on réessaie donc avec une attente croissante.
+  const RETRY_DELAYS = [0, 15000, 30000, 45000];
+
+  async function callGemini(prompt, schema, temperature) {
+    if (AI.server.checked && !AI.hasServerKey()) throw new Error(NO_KEY_MESSAGE);
+    let last = null;
+    for (let i = 0; i < RETRY_DELAYS.length; i++) {
+      if (RETRY_DELAYS[i]) await sleep(RETRY_DELAYS[i]);
+      try {
+        return await callGeminiOnce(prompt, schema, temperature);
+      } catch (e) {
+        last = e;
+        const retryable = e.status === 429 || e.status === 503 || (e.status >= 500 && e.status !== 504);
+        if (!retryable) throw e;
+      }
+    }
+    if (last && last.status === 429) {
+      throw new Error('Quota Gemini atteint (limite de requêtes par minute du projet). Attendez une minute puis relancez : le projet reprend à l’étape en échec.');
+    }
+    throw last;
   }
   T.callGemini = callGemini;
 
