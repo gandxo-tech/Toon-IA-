@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ToonIA Studio — Création de webtoon assistée par IA</title>
+<meta name="description" content="ToonIA Studio : bibles narratives, canon versionné, chapitres, panels, dialogues, lettering et export — en HTML, CSS et JavaScript." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236d4bd8'/%3E%3Ctext x='32' y='46' font-family='Arial Black,sans-serif' font-size='34' fill='%23fff' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#/accueil" data-action="closeSidebar">
+      <span class="brand-mark">T</span>
+      <span>
+        <span class="brand-name">ToonIA</span>
+        <span class="brand-sub">Studio de webtoon</span>
+      </span>
+    </a>
+
+    <nav>
+      <div class="nav-group">
+        <div class="nav-label">Atelier</div>
+        <button class="nav-item" data-route="accueil"><span class="nav-ico">◈</span>Accueil<span class="nav-dot is-empty" data-dot="accueil"></span></button>
+        <button class="nav-item" data-route="projet"><span class="nav-ico">✎</span>Idée &amp; genèse<span class="nav-dot is-empty" data-dot="projet"></span></button>
+        <button class="nav-item" data-route="personnages"><span class="nav-ico">☺</span>Personnages<span class="nav-dot is-empty" data-dot="personnages"></span></button>
+        <button class="nav-item" data-route="univers"><span class="nav-ico">◎</span>Univers &amp; lieux<span class="nav-dot is-empty" data-dot="univers"></span></button>
+        <button class="nav-item" data-route="histoire"><span class="nav-ico">▤</span>Histoire &amp; arc<span class="nav-dot is-empty" data-dot="histoire"></span></button>
+        <button class="nav-item" data-route="direction"><span class="nav-ico">✦</span>Direction art &amp; humour<span class="nav-dot is-empty" data-dot="direction"></span></button>
+        <button class="nav-item" data-route="couverture"><span class="nav-ico">▣</span>Couverture<span class="nav-dot is-empty" data-dot="couverture"></span></button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Fabrication</div>
+        <button class="nav-item" data-route="chapitre"><span class="nav-ico">❐</span>Chapitres &amp; scènes<span class="nav-dot is-empty" data-dot="chapitre"></span></button>
+        <button class="nav-item" data-route="storyboard"><span class="nav-ico">▥</span>Storyboard<span class="nav-dot is-empty" data-dot="storyboard"></span></button>
+        <button class="nav-item" data-route="panels"><span class="nav-ico">▧</span>Panels<span class="nav-dot is-empty" data-dot="panels"></span></button>
+        <button class="nav-item" data-route="dialogues"><span class="nav-ico">❝</span>Dialogues<span class="nav-dot is-empty" data-dot="dialogues"></span></button>
+        <button class="nav-item" data-route="lettering"><span class="nav-ico">✍</span>Lettering &amp; bulles<span class="nav-dot is-empty" data-dot="lettering"></span></button>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Canon &amp; diffusion</div>
+        <button class="nav-item" data-route="canon"><span class="nav-ico">◉</span>Canon Memory<span class="nav-dot is-empty" data-dot="canon"></span></button>
+        <button class="nav-item" data-route="lecture"><span class="nav-ico">☰</span>Lecture verticale<span class="nav-dot is-empty" data-dot="lecture"></span></button>
+        <button class="nav-item" data-route="export"><span class="nav-ico">↧</span>Export</button>
+        <button class="nav-item" data-route="reglages"><span class="nav-ico">⚙</span>Clé API &amp; moteur</button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main">
+    <header class="topbar">
+      <button class="btn btn-ghost btn-icon mobile-toggle" data-action="toggleSidebar" aria-label="Ouvrir le menu">☰</button>
+      <div>
+        <h2 class="topbar-title" id="topbar-title">Accueil</h2>
+        <p class="topbar-sub" id="topbar-sub">Studio de webtoon assisté par IA</p>
+      </div>
+      <div class="spacer"></div>
+      <div class="project-select">
+        <span class="tiny">Projet</span>
+        <select id="project-select" aria-label="Projet actif"></select>
+      </div>
+      <span class="badge badge-ai" id="engine-badge">Mode démo</span>
+    </header>
+
+    <main class="view" id="view"></main>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+<div id="modal-root"></div>
+
+<script src="js/core.js"></script>
+<script src="js/views.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
