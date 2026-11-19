@@ -333,7 +333,7 @@
       version: 1,
       projects: [demo],
       activeId: demo.id,
-      settings: { apiKey: '', model: 'gemini-3.1-flash-lite-preview', demo: true }
+      settings: { apiKey: '', model: 'gemini-3.1-flash-lite-preview', demo: false }
     };
   }
 
@@ -346,7 +346,7 @@
       const parsed = JSON.parse(raw);
       if (!parsed || !Array.isArray(parsed.projects) || !parsed.projects.length) throw new Error('état invalide');
       T.state = parsed;
-      T.state.settings = Object.assign({ apiKey: '', model: 'gemini-3.1-flash-lite-preview', demo: true }, parsed.settings || {});
+      T.state.settings = Object.assign({ apiKey: '', model: 'gemini-3.1-flash-lite-preview', demo: false }, parsed.settings || {});
       if (!T.state.projects.some((p) => p.id === T.state.activeId)) T.state.activeId = T.state.projects[0].id;
     } catch (e) {
       T.state = seedState();
