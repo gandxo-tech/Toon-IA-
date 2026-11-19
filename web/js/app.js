@@ -100,8 +100,8 @@
       '<option value="' + esc(pr.id) + '"' + (pr.id === p.id ? ' selected' : '') + '>' + esc(T.clamp(pr.title, 34)) + '</option>').join('');
 
     const badge = document.getElementById('engine-badge');
-    badge.textContent = T.ai.hasServerKey() && !T.ai.hasKey() && !T.state.settings.demo ? 'Gemini · serveur' : T.ai.isDemo() ? 'Mode démo' : 'Gemini';
-    badge.className = 'badge ' + (T.ai.isDemo() ? 'badge-ai' : 'badge-canon');
+    badge.textContent = T.ai.engineLabel();
+    badge.className = 'badge ' + (T.ai.hasServerKey() ? 'badge-canon' : 'badge-ai');
 
     document.getElementById('sidebar').classList.remove('is-open');
 
@@ -127,6 +127,7 @@
       T.toast('Échec de la génération', 'error');
     } finally {
       T.busy = null;
+      T.job = null;
       T.save();
       render({ keepScroll: true });
     }
@@ -432,6 +433,127 @@
     evenementsSouhaites: ''
   };
 
+  /* ---------------- génération complète depuis le brief ---------------- */
+  function seedCanon(p) {
+    if ((p.canon.characters || []).length) return;
+    p.canon.characters = (p.characters || []).map((c) => JSON.parse(JSON.stringify(Object.assign({}, c, { isValidated: true }))));
+    p.canon.locations = ((p.world && p.world.locations) || []).map((l) => JSON.parse(JSON.stringify(l)));
+    (p.characters || []).forEach((c) => addMemory(p, 'Personnage', c.name + ' — ' + c.role + '. ' + T.clamp(c.physicalAppearance, 160), 'Continuité visuelle et narrative.'));
+    if (p.world) {
+      p.canon.worldBible = {
+        rules: p.world.rules, factions: p.world.factions, geography: p.world.geography,
+        socialStructure: p.world.socialStructure, historyLore: p.world.historyLore,
+        terminology: p.world.terminology, worldConstraints: p.world.worldConstraints
+      };
+      addMemory(p, 'Règle Univers', T.clamp(p.world.rules, 260), 'Loi fondamentale du monde.');
+      addMemory(p, 'Contrainte Univers', T.clamp(p.world.worldConstraints, 220), 'Interdits créatifs.');
+      (p.world.locations || []).forEach((l) => addMemory(p, 'Lieu', l.name + ' — ' + T.clamp(l.description, 160) + ' Atmosphère : ' + l.atmosphere, 'Décor canonique.'));
+    }
+    if (p.story) {
+      p.canon.storyBible = {
+        mainThemes: p.story.mainThemes, narrativeDirection: p.story.narrativeDirection,
+        generalTone: p.story.generalTone, premise: p.story.premise
+      };
+      addMemory(p, 'Thème', T.clamp(p.story.mainThemes, 200), 'Orientation thématique du récit.');
+      (p.story.timelineEvents || []).forEach((e) => addMemory(p, 'Événement clé', e.dateOrEpoch + ' — ' + e.title + ' : ' + T.clamp(e.description, 160), 'Fait antérieur au chapitre 1.'));
+    }
+    if (p.marketing) {
+      p.canon.cover = {
+        title: p.marketing.selectedTitle || p.title,
+        tagline: p.marketing.selectedTagline || '',
+        visualDescription: (p.marketing.coverProposal && p.marketing.coverProposal.detailedDescriptionNoText) || ''
+      };
+      p.canon.project = { finalTitle: p.canon.cover.title, finalSynopsis: p.marketing.selectedSynopsis || '' };
+      addMemory(p, 'Titre', p.canon.cover.title, 'Titre éditorial validé.');
+    }
+  }
+
+  async function generateProject() {
+    const p = T.project();
+    if (!p) throw new Error('Aucun projet actif.');
+    if (String(p.idea || '').trim().length < 40) {
+      throw new Error('Le brief est trop court : décrivez l’univers, les personnages, le ton et l’arc en quelques phrases.');
+    }
+    if (T.ai.server.checked && !T.ai.hasServerKey()) {
+      throw new Error('TOON_IA est absente de ce déploiement. Ajoutez la variable dans Vercel → Settings → Environment Variables, puis redéployez.');
+    }
+
+    const chapters = Math.min(3, Math.max(1, Number(T.state.settings.chapters) || 1));
+    const softErrors = [];
+    const job = (T.job = { label: 'Analyse du brief', done: 0, total: 5 + chapters + 1 });
+    const step = (label) => { job.label = label; render({ keepScroll: true }); };
+    const advance = () => { job.done += 1; };
+    const checkpoint = () => { p.updatedAt = T.now(); T.save(); };
+
+    step('Analyse du brief');
+    p.analysis = await T.ai.analyze(p);
+    advance(); checkpoint();
+
+    step('Character Bible');
+    p.characters = await T.ai.characters(p);
+    advance(); checkpoint();
+
+    step('World Bible');
+    p.world = await T.ai.world(p);
+    advance(); checkpoint();
+
+    step('Story Bible');
+    p.story = await T.ai.story(p);
+    advance(); checkpoint();
+
+    step('Direction artistique & Humor DNA');
+    const vh = await T.ai.visualHumor(p);
+    p.visual = vh.visual;
+    p.humor = vh.humor;
+    advance(); checkpoint();
+
+    p.chapters = [];
+    let first = null;
+    for (let n = 1; n <= chapters; n++) {
+      step('Chapitre ' + n + ' — script');
+      const ch = await T.ai.chapter(p, n);
+      p.chapters.push(ch);
+      if (n === 1) first = ch;
+      advance(); checkpoint();
+    }
+
+    if (first) {
+      for (const scene of first.scenes) {
+        step('Chapitre 1 — panels : ' + scene.title);
+        try {
+          scene.panels = await T.ai.panels(p, scene);
+        } catch (e) {
+          scene.panels = [];
+          softErrors.push('Panels « ' + scene.title + ' » : ' + (e.message || 'échec'));
+        }
+        job.total += (scene.panels || []).length;
+        advance();
+        for (const panel of scene.panels || []) {
+          step('Chapitre 1 — bulles : panel ' + panel.orderIndex);
+          try {
+            panel.dialogues = await T.ai.dialogues(p, panel);
+          } catch (e) {
+            panel.dialogues = [];
+            softErrors.push('Bulles panel ' + panel.orderIndex + ' : ' + (e.message || 'échec'));
+          }
+          advance();
+        }
+        checkpoint();
+      }
+      if (first.scenes[0]) T.ui.sceneId = first.scenes[0].id;
+    }
+
+    step('Couverture, titres & synopsis');
+    p.marketing = await T.ai.marketing(p);
+    advance();
+
+    seedCanon(p);
+    checkpoint();
+    T.toast('Projet complet généré · ' + chapters + ' chapitre(s), ' + T.stats(p).panels + ' panels', 'ok');
+    if (softErrors.length) T.toast(softErrors.length + ' étape(s) partielle(s) : utilisez « Réessayer » dans les modules concernés', 'error');
+    navigate('couverture');
+  }
+
   /* ---------------- actions ---------------- */
   const actions = {
     go: (el) => navigate(el.dataset.route),
@@ -546,11 +668,9 @@
       const p = T.project();
       const s = findScene(p, T.ui.sceneId);
       if (!s) throw new Error('Aucune scène sélectionnée.');
-      s.detail = T.demo.sceneDetail(p, s);
-      if (!T.ai.isDemo()) {
-        // l'enrichissement local reste volontairement déterministe (pas de coût API)
-      }
+      s.detail = await T.ai.sceneDetail(p, s);
     }),
+    'gen-all': () => run('all', generateProject),
     'gen-panels': () => run('panels', async () => {
       const p = T.project();
       const s = findScene(p, T.ui.sceneId);
@@ -664,31 +784,24 @@
     'export-all': () => exportAll(),
     print: () => window.print(),
 
-    'save-key': () => {
-      const input = document.getElementById('api-key-input');
-      const val = input && input.value ? input.value.trim() : '';
-      if (!val) { T.toast('Collez une clé avant d’enregistrer', 'error'); return; }
-      T.state.settings.apiKey = val;
-      T.state.settings.demo = false;
-      T.save(); render(); T.toast('Clé enregistrée pour ce navigateur', 'ok');
-    },
     'test-key': () => {
       (async () => {
-        T.toast('Test de la clé en cours…');
+        T.toast('Test du moteur en cours…');
         try {
           await T.ai.testKey();
-          T.toast('Connexion réussie', 'ok');
+          T.toast('Connexion Gemini réussie', 'ok');
         } catch (e) {
-          T.toast('Échec : ' + (e.message || 'clé invalide'), 'error');
+          T.toast('Échec : ' + (e.message || 'moteur indisponible'), 'error');
         }
       })();
     },
-    'clear-key': () => {
-      T.state.settings.apiKey = '';
-      T.state.settings.demo = true;
-      T.save(); render(); T.toast('Clé effacée');
+    'check-engine': () => {
+      (async () => {
+        await T.ai.checkServer();
+        render({ keepScroll: true });
+        T.toast(T.ai.hasServerKey() ? 'Moteur prêt · TOON_IA détectée' : 'TOON_IA introuvable sur ce déploiement', T.ai.hasServerKey() ? 'ok' : 'error');
+      })();
     },
-    'toggle-demo': (el) => { T.state.settings.demo = !!el.checked; T.save(); render({ keepScroll: true }); },
     copy: async (el) => {
       const text = el.dataset.copy || '';
       try {
@@ -713,7 +826,7 @@
     if (!isHashLink) ev.preventDefault();
 
     // les cases à cocher sont traitées par l'événement change (évite le double rendu)
-    if (el.type === 'checkbox' && (action === 'toggle-demo' || action === 'toggle-chibi')) return;
+    if (el.type === 'checkbox' && action === 'toggle-chibi') return;
 
     if (action === 'retry-last' || action === 'confirm-pending') {
       const fn = actions[action];
@@ -727,14 +840,14 @@
     }
 
     // checkbox actions (change event also handled)
-    if (action === 'toggle-demo' || action === 'toggle-chibi') {
+    if (action === 'toggle-chibi') {
       const fn = actions[action];
       if (fn) fn(el);
       return;
     }
 
     // async actions
-    if (['analyze', 'gen-characters', 'gen-world', 'gen-story', 'gen-visual', 'gen-chapter', 'gen-detail', 'gen-panels', 'gen-dialogues', 'gen-marketing'].includes(action)) {
+    if (['analyze', 'gen-all', 'gen-characters', 'gen-world', 'gen-story', 'gen-visual', 'gen-chapter', 'gen-detail', 'gen-panels', 'gen-dialogues', 'gen-marketing'].includes(action)) {
       const fn = actions[action];
       if (fn) fn(el);
       return;
@@ -763,7 +876,6 @@
       return;
     }
 
-    if (el.dataset && el.dataset.action === 'toggle-demo') { actions['toggle-demo'](el); return; }
     if (el.dataset && el.dataset.action === 'toggle-chibi') { actions['toggle-chibi'](el); return; }
 
     if (el.dataset && el.dataset.bind && el.dataset.kind === 'select') {

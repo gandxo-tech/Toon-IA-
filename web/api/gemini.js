@@ -1,7 +1,7 @@
 /**
  * POST /api/gemini — proxy serveur vers l'API Gemini.
  *
- * La clé vit uniquement dans la variable d'environnement Vercel `GEMINI_API_KEY`.
+ * La clé vit uniquement dans la variable d'environnement Vercel `TOON_IA`.
  * Elle n'est jamais renvoyée au navigateur, ni journalisée, ni incluse dans une erreur.
  * Modèles limités à une liste blanche pour éviter tout détournement de quota.
  */
@@ -18,10 +18,14 @@ if (process.env.GEMINI_MODEL) ALLOWED_MODELS.add(process.env.GEMINI_MODEL);
 const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite-preview';
 const MAX_PROMPT_CHARS = 24000;
 const WINDOW_MS = 60 * 1000;
-const MAX_REQUESTS_PER_WINDOW = 24;
+const MAX_REQUESTS_PER_WINDOW = 90;
 
 // Limite best-effort, par instance de fonction (pas une garantie distribuée).
 const hits = new Map();
+
+function readApiKey() {
+  return process.env.TOON_IA || process.env.GEMINI_API_KEY || '';
+}
 
 function rateLimited(ip) {
   const now = Date.now();
@@ -42,12 +46,12 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: { message: 'Méthode non autorisée.' } });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = readApiKey();
   if (!apiKey) {
     return res.status(503).json({
       error: {
         message:
-          'GEMINI_API_KEY n’est pas configurée sur ce déploiement. Ajoutez-la dans Vercel → Settings → Environment Variables, puis redéployez.'
+          'La variable TOON_IA n’est pas configurée sur ce déploiement. Ajoutez-la dans Vercel → Settings → Environment Variables, puis redéployez.'
       }
     });
   }

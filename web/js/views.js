@@ -91,6 +91,40 @@
       '</div>';
   }
 
+  /* ---------- brief unique ---------- */
+  const BRIEF_EXAMPLE = 'Ex : Un thriller psychologique dans une ville portuaire de 1990. Sujet : une inspectrice en disgrâce enquête sur trois disparitions que sa hiérarchie veut enterrer. Personnages, ton, ambiances, palette, chapitres, contraintes… écrivez tout ici.';
+
+  function briefCard(p) {
+    const job = T.job;
+    const ready = T.ai.hasServerKey();
+    const missing = T.ai.server.checked && !ready;
+    const chapters = Math.min(3, Math.max(1, Number(T.state.settings.chapters) || 1));
+    const words = p.idea ? p.idea.split(/\s+/).filter(Boolean).length : 0;
+    return '<div class="card" style="margin-bottom:18px">' +
+      '<div class="row-between" style="align-items:flex-start"><div>' +
+        '<div class="eyebrow">Brief unique</div>' +
+        '<h2 style="margin:4px 0 6px">Votre gros prompt</h2>' +
+        '<p class="small" style="margin:0;max-width:78ch">Collez votre brief complet. « Générer tout le projet » enchaîne analyse, personnages, univers, histoire, direction artistique, chapitres, storyboard, panels, dialogues et couverture.</p>' +
+      '</div><span class="badge ' + (ready ? 'badge-canon' : 'badge-ai') + '">' + esc(T.ai.engineLabel()) + '</span></div>' +
+      '<label class="field" style="margin-top:14px"><span>Brief / prompt</span>' +
+        '<textarea class="textarea textarea-lg" style="min-height:190px" data-bind="idea" data-kind="area" placeholder="' + esc(BRIEF_EXAMPLE) + '">' + esc(p.idea) + '</textarea></label>' +
+      '<div class="row-between" style="gap:12px;flex-wrap:wrap">' +
+        '<div class="row" style="gap:12px;flex-wrap:wrap">' +
+          '<label class="field" style="margin:0;min-width:150px"><span>Chapitres à écrire</span><select class="select" data-bind="settings.chapters" data-kind="select">' +
+            [1, 2, 3].map((n) => '<option value="' + n + '"' + (chapters === n ? ' selected' : '') + '>' + n + ' chapitre' + (n > 1 ? 's' : '') + '</option>').join('') + '</select></label>' +
+          '<span class="tiny" style="align-self:flex-end;padding-bottom:10px">' + words + ' mot' + (words > 1 ? 's' : '') + ' · le chapitre 1 est entièrement découpé en panels et bulles</span>' +
+        '</div>' +
+        '<button class="btn btn-primary" data-action="gen-all"' + (missing ? ' disabled' : '') + '>✦ Générer tout le projet</button>' +
+      '</div>' +
+      (missing
+        ? '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>TOON_IA absente de ce déploiement</h4><p>Ajoutez la variable <span class="mono">TOON_IA</span> dans Vercel (Production) puis redéployez : sans elle, aucune génération n’est possible.</p></div></div>'
+        : '') +
+      (job
+        ? '<div class="alert alert-info" style="margin-top:12px"><span class="alert-ico"><span class="spinner"></span></span><div><h4>' + esc(job.label) + '</h4><p>' + job.done + ' / ' + Math.max(job.total, job.done) + ' étapes — laissez l’onglet ouvert.</p><div style="height:6px;background:rgba(255,255,255,.08);border-radius:999px;margin-top:8px;overflow:hidden"><div style="height:100%;width:' + Math.min(100, Math.round((job.done / Math.max(job.total, 1)) * 100)) + '%;background:var(--violet)"></div></div></div></div>'
+        : '') +
+      '</div>';
+  }
+
   /* =========================================================
      ACCUEIL
      ========================================================= */
@@ -116,6 +150,7 @@
     ];
 
     return head('Studio de webtoon', 'Une idée. Un canon. Un webtoon.', 'Transformez une prémisse en récit structuré : bibles narratives, personnages cohérents, chapitres, panels, dialogues et export — sans jamais corriger une contradiction en silence.', '<button class="btn btn-primary" data-action="new-project">+ Nouveau webtoon</button>') +
+      briefCard(p) +
       '<div class="hero">' +
         '<div class="eyebrow">Projet actif</div>' +
         '<h1>' + esc(p.title) + '</h1>' +
@@ -123,7 +158,7 @@
         '<div class="row">' +
           '<button class="btn btn-primary" data-action="go" data-route="projet">' + (p.analysis ? 'Reprendre l’analyse' : 'Commencer l’analyse') + ' →</button>' +
           '<span class="badge">' + doneCount + '/9 étapes</span>' +
-          '<span class="badge badge-ai">' + (T.ai.isDemo() ? 'Moteur démo' : 'Gemini · ' + esc(T.state.settings.model)) + '</span>' +
+          '<span class="badge ' + (T.ai.hasServerKey() ? 'badge-canon' : 'badge-ai') + '">' + esc(T.ai.engineLabel()) + '</span>' +
           (p.idea ? '<span class="badge">' + (p.idea.length > 0 ? Math.round(p.idea.split(/\s+/).length) : 0) + ' mots</span>' : '') +
         '</div>' +
         '<div class="pipeline">' + progress.map((x) =>
@@ -150,9 +185,7 @@
           '</button>';
       }).join('') + '</div>' +
 
-      (T.ai.hasKey() && T.state.settings.demo
-        ? '<div class="alert alert-warn" style="margin-top:18px"><span class="alert-ico">⚡</span><div><h4>Une clé API est enregistrée mais le mode démo est actif</h4><p>Désactivez le mode démo dans « Clé API & moteur » pour utiliser réellement Gemini.</p></div></div>'
-        : '');
+      '';
   };
 
   /* =========================================================
@@ -194,7 +227,7 @@
       '<div class="card">' +
         '<div class="row-between" style="margin-bottom:10px"><h3 style="margin:0">Résultat de l’analyse</h3>' + (a ? badge(true, 'Modifiable') : badge(false, 'En attente')) + '</div>' +
         (!a
-          ? empty('✦', 'Aucune analyse', 'Saisissez une idée puis lancez l’analyse. En mode démo, le moteur produit un résultat structuré et déterministe à partir de votre texte.')
+          ? empty('✦', 'Aucune analyse', 'Collez votre brief puis lancez l’analyse : Gemini en extrait le genre, le ton, les thèmes et les points à clarifier.')
           : '<div class="stack">' +
               '<div class="grid grid-2">' +
                 '<label class="field"><span>Genre principal</span><input class="input" ' + bind('analysis.genrePrincipal', 'text') + ' value="' + esc(a.genrePrincipal) + '" /></label>' +
@@ -665,7 +698,7 @@
           '<div class="reader-panel"><img src="' + T.art(pn.artSeed || (ch.id + ':' + i), genreId) + '" alt="Panel ' + esc(pn.orderIndex) + '" loading="lazy" />' +
             (pn.dialogues || []).map((d) => '<div class="bubble bubble-' + esc(d.type.toLowerCase()) + ' pos-' + (d.placement || 'TOP_LEFT').toLowerCase().replace(/_/g, '-') + '">' + esc(d.text) + '</div>').join('') +
           '</div>').join('') + '</div>').join('') +
-      '<p class="tiny" style="text-align:center;margin-top:18px">Visuels procéduraux de démonstration — remplacez-les par vos illustrations générées.</p>';
+      '<p class="tiny" style="text-align:center;margin-top:18px">Visuels procéduraux (SVG) — remplacez-les par vos illustrations générées.</p>';
   };
 
   /* =========================================================
@@ -702,36 +735,33 @@
      ========================================================= */
   Views.reglages = function () {
     const s = T.state.settings;
-    const mask = s.apiKey ? s.apiKey.slice(0, 6) + '••••••••' + s.apiKey.slice(-4) : '';
-    return head('Moteur', 'Clé API & moteur', 'Sans clé, l’application fonctionne en mode démo déterministe. Avec une clé, elle appelle Gemini directement depuis le navigateur.', '') +
+    const ok = T.ai.hasServerKey();
+    return head('Moteur', 'Moteur Gemini', 'Le site passe par le proxy serveur <span class="mono">/api/gemini</span>. La clé est lue dans la variable d’environnement Vercel <span class="mono">TOON_IA</span> : elle n’est jamais envoyée au navigateur, ni stockée ici.', '<button class="btn" data-action="check-engine">Revérifier le moteur</button>') +
       '<div class="grid grid-2"><div>' +
-        '<div class="card"><h3>Clé API Gemini</h3>' +
-          (T.ai.hasServerKey()
-            ? '<div class="alert alert-ok" style="margin-bottom:12px"><span class="alert-ico">✓</span><div><h4>Clé serveur active</h4><p>Le déploiement utilise <span class="mono">GEMINI_API_KEY</span> côté serveur via <span class="mono">/api/gemini</span>. La clé n’est jamais envoyée au navigateur.</p></div></div>'
-            : '<div class="alert alert-info" style="margin-bottom:12px"><span class="alert-ico">⚙</span><div><h4>Aucune clé serveur détectée</h4><p>Pour l’activer : Vercel → Settings → Environment Variables → <span class="mono">GEMINI_API_KEY</span>, puis redéployez. En attendant, le mode démo fonctionne.</p></div></div>') +
-          (s.apiKey ? '<p class="small">Clé locale (ce navigateur) : <span class="mono">' + esc(mask) + '</span></p>' : '<p class="small">Aucune clé locale : la clé serveur est utilisée si elle existe, sinon le mode démo.</p>') +
-          '<label class="field"><span>Clé (AIza…)</span><input class="input" type="password" id="api-key-input" placeholder="Collez votre clé Gemini" autocomplete="off" /></label>' +
+        '<div class="card"><h3>Clé serveur</h3>' +
+          (ok
+            ? '<div class="alert alert-ok" style="margin-bottom:12px"><span class="alert-ico">✓</span><div><h4>TOON_IA détectée</h4><p>Le déploiement peut appeler Gemini. Chaque génération utilise votre quota.</p></div></div>'
+            : '<div class="alert alert-danger" style="margin-bottom:12px"><span class="alert-ico">⛔</span><div><h4>TOON_IA introuvable</h4><p>Ajoutez la variable <span class="mono">TOON_IA</span> dans Vercel → Settings → Environment Variables (Production), puis redéployez. Sans elle, aucune génération n’est possible.</p></div></div>') +
           '<label class="field"><span>Modèle</span><select class="select" data-bind="settings.model" data-kind="select">' +
-            ['gemini-3.1-flash-lite-preview', 'gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'].map((m) => '<option' + (s.model === m ? ' selected' : '') + '>' + m + '</option>').join('') + '</select>' +
-            '<span class="tiny" style="display:block;margin-top:6px">Les modèles réellement disponibles dépendent de votre clé et de votre région.</span></label>' +
-          '<div class="row"><button class="btn btn-primary" data-action="save-key">Enregistrer la clé</button>' +
-          '<button class="btn" data-action="test-key">Tester la connexion</button>' +
-          (s.apiKey ? '<button class="btn btn-ghost" data-action="clear-key">Effacer</button>' : '') + '</div>' +
-          '<label class="row" style="margin-top:14px;gap:8px"><input type="checkbox" data-action="toggle-demo" ' + (s.demo ? 'checked' : '') + ' /> <span class="small">Forcer le mode démo (aucun appel réseau)</span></label>' +
+            T.ai.MODELS.map((m) => '<option' + (s.model === m ? ' selected' : '') + '>' + m + '</option>').join('') + '</select>' +
+            '<span class="tiny" style="display:block;margin-top:6px">Les modèles réellement disponibles dépendent de la clé et de la région. <span class="mono">GEMINI_MODEL</span> côté Vercel force le modèle par défaut.</span></label>' +
+          '<div class="row"><button class="btn btn-primary" data-action="test-key">Tester la connexion</button>' +
+          '<button class="btn btn-ghost" data-action="go" data-route="accueil">Retour au brief</button></div>' +
         '</div>' +
         '<div class="card" style="margin-top:16px"><h3>Stockage & projet</h3>' +
-          '<p class="small">L’état est conservé dans le <span class="mono">localStorage</span> de ce navigateur. Rien n’est envoyé à un serveur en mode démo.</p>' +
+          '<p class="small">L’état est conservé dans le <span class="mono">localStorage</span> de ce navigateur. Aucune clé n’y est enregistrée.</p>' +
           '<div class="row"><button class="btn btn-ghost" data-action="export-all">Exporter tous les projets</button>' +
           '<button class="btn btn-danger" data-action="reset-all">Réinitialiser l’application</button></div>' +
           '<div class="divider"></div><div class="row"><button class="btn btn-ghost btn-sm" data-action="delete-project">Supprimer le projet actif</button></div>' +
         '</div></div>' +
-        '<div class="card"><h3>⚠ Avertissements de sécurité</h3>' +
-          '<div class="alert alert-danger" style="margin-bottom:10px"><span class="alert-ico">⛔</span><div><h4>Ne saisissez pas la clé ici en production</h4><p>Une clé locale est stockée dans ce navigateur. Sur le déploiement, utilisez plutôt <span class="mono">GEMINI_API_KEY</span> dans Vercel : elle reste côté serveur, conformément au finding S1 de l’audit.</p></div></div>' +
-          '<div class="alert alert-warn"><span class="alert-ico">⚡</span><div><h4>Quotas</h4><p>Chaque génération consomme votre quota Gemini. L’application n’affiche pas encore de compteur de tokens ni de plafond par projet (finding A7).</p></div></div>' +
-          '<div class="divider"></div><h3>État du moteur</h3>' +
-          '<p class="small">Mode : <b>' + (T.ai.isDemo() ? 'démo local' : T.ai.hasKey() ? 'Gemini (clé locale) ' + esc(s.model) : 'Gemini via proxy serveur ' + esc(s.model)) + '</b></p>' +
-          '<p class="small">Projets enregistrés : <b>' + T.state.projects.length + '</b></p>' +
-          '<p class="tiny">Les visuels de panels et la couverture sont des compositions SVG procédurales : aucun appel à un modèle d’image n’est effectué.</p>' +
+        '<div class="card"><h3>État du moteur</h3>' +
+          '<dl class="kv"><dt>Clé serveur</dt><dd>' + (ok ? 'configurée (TOON_IA)' : 'absente') + '</dd>' +
+          '<dt>Modèle</dt><dd>' + esc(s.model) + '</dd>' +
+          '<dt>Proxy</dt><dd class="mono">POST /api/gemini</dd>' +
+          '<dt>Clé dans le navigateur</dt><dd>aucune</dd></dl>' +
+          '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>Quotas</h4><p>Chaque génération consomme du quota Gemini. La génération complète enchaîne une vingtaine d’appels : lancez-la sur un brief déjà réfléchi.</p></div></div>' +
+          '<div class="alert alert-info" style="margin-top:10px"><span class="alert-ico">◈</span><div><h4>Visuels</h4><p>Les panels et la couverture restent des compositions SVG procédurales : aucun modèle d’image n’est appelé. Les prompts visuels sont fournis prêts à l’emploi.</p></div></div>' +
+          '<div class="divider"></div><p class="small" style="margin:0">Projets enregistrés : <b>' + T.state.projects.length + '</b></p>' +
         '</div></div>';
   };
 })();

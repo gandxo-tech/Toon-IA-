@@ -1,7 +1,7 @@
 /* =========================================================
    ToonIA Studio — core.js
-   État, persistance locale, moteur de démonstration,
-   client Gemini, visuels procéduraux, moteur canonique.
+   État, persistance locale, client Gemini (proxy serveur),
+   visuels procéduraux, moteur canonique.
    ========================================================= */
 (function () {
   'use strict';
@@ -328,12 +328,12 @@
   };
 
   function seedState() {
-    const demo = T.blankProject('Projet démo ToonIA', 'Dans une métropole sous-marine isolée du monde, une cartographe découvre que le dôme commence à se fissurer depuis l’intérieur.');
+    const projet = T.blankProject('Mon webtoon', '');
     return {
-      version: 1,
-      projects: [demo],
-      activeId: demo.id,
-      settings: { apiKey: '', model: 'gemini-3.1-flash-lite-preview', demo: false }
+      version: 2,
+      projects: [projet],
+      activeId: projet.id,
+      settings: { model: 'gemini-3.1-flash-lite-preview', chapters: 1 }
     };
   }
 
@@ -346,7 +346,14 @@
       const parsed = JSON.parse(raw);
       if (!parsed || !Array.isArray(parsed.projects) || !parsed.projects.length) throw new Error('état invalide');
       T.state = parsed;
-      T.state.settings = Object.assign({ apiKey: '', model: 'gemini-3.1-flash-lite-preview', demo: false }, parsed.settings || {});
+      T.state.settings = Object.assign({ model: 'gemini-3.1-flash-lite-preview', chapters: 1 }, parsed.settings || {});
+      // Plus de mode démo ni de clé stockée dans le navigateur.
+      delete T.state.settings.demo;
+      delete T.state.settings.apiKey;
+      // Retire le projet de démonstration des versions précédentes s'il est resté vierge.
+      T.state.projects = T.state.projects.filter((pr) => !(pr.title === 'Projet démo ToonIA' && !pr.analysis && !(pr.chapters || []).length));
+      if (!T.state.projects.length) T.state.projects.push(T.blankProject('Mon webtoon', ''));
+      T.state.version = 2;
       if (!T.state.projects.some((p) => p.id === T.state.activeId)) T.state.activeId = T.state.projects[0].id;
     } catch (e) {
       T.state = seedState();
@@ -398,339 +405,44 @@
     setTimeout(() => el.remove(), 3000);
   };
 
-  /* ---------------- moteur de démonstration ---------------- */
-  const Demo = (T.demo = {});
-
-  Demo.analysis = function (p) {
-    const g = detectProfile(p);
-    const adv = p.advanced || {};
-    const names = extractNames(p.idea, g);
-    const rng = T.rngFor(p.idea + p.title);
-    const explicit = [];
-    if (adv.genre) explicit.push('Genre souhaité : ' + adv.genre);
-    if (adv.ambiance) explicit.push('Ambiance visée : ' + adv.ambiance);
-    if (adv.epoque) explicit.push('Contexte temporel : ' + adv.epoque);
-    if (adv.personnagesSouhaites) explicit.push('Personnages demandés : ' + adv.personnagesSouhaites);
-    if (adv.inspirations) explicit.push('Inspirations : ' + adv.inspirations);
-    if (adv.contraintes) explicit.push('Contrainte narrative : ' + adv.contraintes);
-    if (!explicit.length) {
-      String(p.idea || '').split(/[.;!?]/).map((s) => s.trim()).filter((s) => s.length > 24).slice(0, 3)
-        .forEach((s) => explicit.push('Élément posé par l’auteur : ' + T.clamp(s, 120)));
-    }
-
-    const ambiguities = [];
-    if (!adv.personnagesSouhaites && names.length === 0) ambiguities.push('Qui est le personnage principal, et que veut-il précisément ?');
-    if (!adv.ambiance) ambiguities.push('Quelle ambiance dominante : chaleureuse, inquiétante, épique ?');
-    if (!adv.longueurVisee) ambiguities.push('Quelle longueur visée : one-shot, saison courte ou série longue ?');
-    if (!adv.publicCible) ambiguities.push('À quel public s’adresse le webtoon (âge, codes de lecture) ?');
-    if (!adv.contraintes) ambiguities.push('Quel est le dilemme central, et qu’est-ce qui empêche le héros d’y répondre ?');
-    if (ambiguities.length < 2) ambiguities.push('Quel événement déclenche l’histoire au chapitre 1 ?');
-
-    return {
-      genrePrincipal: adv.genre || g.label,
-      sousGenres: T.rotate(rng, g.subgenres, 3),
-      ton: adv.ambiance || g.tone,
-      themesDetectes: T.rotate(rng, g.themes, 4),
-      elementsNarratifsExplicites: explicit,
-      ambiguitesAClarifier: ambiguities.slice(0, 5),
-      _genreId: g.id
-    };
-  };
-
-  function makeCharacters(p) {
-    const g = detectProfile(p);
-    const names = extractNames(p.idea, g);
-    const hero = names[0] || g.hero;
-    const ally = names[1] || g.hero2;
-    const rng = T.rngFor(p.idea + 'chars');
-    const roles = [
-      { role: 'Protagoniste', name: hero, arche: g.archetype },
-      { role: 'Allié', name: ally, arche: 'Contrepoint pragmatique du héros' },
-      { role: 'Antagoniste', name: g.antagonist, arche: 'Gardien d’un ordre injuste' },
-      { role: 'Mentor', name: g.mentor, arche: 'Ancien qui a payé le prix' }
-    ];
-    return roles.map((r, i) => {
-      const isHero = i === 0;
-      return {
-        id: T.uid('char'),
-        name: r.name,
-        role: r.role,
-        archetype: r.arche,
-        personality: isHero
-          ? 'Tenace, ironique quand il a peur, incapable de laisser une injustice sans réponse. Faiblesse : confond protéger et décider à la place des autres.'
-          : r.role === 'Antagoniste'
-            ? 'Calme, persuasif, convaincu que sa cruauté est une forme de soin. Faiblesse : ne supporte pas d’être contredit publiquement.'
-            : r.role === 'Mentor'
-              ? 'Patient, économe en mots, hanté par une erreur ancienne. Faiblesse : préfère le silence à l’aveu.'
-              : 'Direct, drôle, loyal jusqu’à l’imprudence. Faiblesse : parle avant de réfléchir dès qu’on touche à ses proches.',
-        physicalAppearance: isHero
-          ? 'Silhouette sèche, cheveux ' + g.hair + ', yeux ' + g.eyes + ', une cicatrice fine au sourcil gauche.'
-          : r.role === 'Antagoniste'
-            ? 'Grand, cheveux blancs coupés court, yeux ' + g.eyes + ' presque translucides, visage sans expression.'
-            : 'Visage ouvert, cheveux ' + (i === 1 ? 'courts châtains' : 'gris coupés ras') + ', yeux ' + (i === 1 ? 'verts' : 'gris') + ', tient toujours quelque chose dans les mains.',
-        distinctiveFeatures: isHero
-          ? 'Cicatrice au sourcil gauche, tic consistant à faire craquer son pouce.'
-          : r.role === 'Antagoniste'
-            ? 'Bague plate à l’index droit, jamais de cravate.'
-            : i === 1 ? 'Une boucle d’oreille unique, toujours du même côté.' : 'Boite légèrement, le sait et s’en sert.',
-        characteristicClothing: isHero ? g.look : r.role === 'Antagoniste' ? 'Costume sombre sans ornement, gants de cuir fin' : 'Vêtements pratiques, une pièce toujours de travers',
-        abilities: isHero ? g.ability : r.role === 'Antagoniste' ? 'Réseau, influence, lecture des faiblesses' : r.role === 'Mentor' ? 'Savoir technique et mémoire longue' : 'Débrouillardise, contacts, sang-froid',
-        relationships: isHero
-          ? 'Lien de confiance fragile avec ' + g.hero2 + ' ; fascination méfiante pour ' + g.antagonist + '.'
-          : r.role === 'Antagoniste'
-            ? 'Voit en ' + hero + ' un successeur possible, donc une menace.'
-            : 'Protège ' + hero + ' sans toujours le dire.',
-        plannedArc: isHero
-          ? 'Passer de « sauver tout le monde seul » à « choisir avec qui porter le poids ».'
-          : r.role === 'Antagoniste' ? 'Révéler que son ordre protège une chose pire encore.' : 'Sortir de la dette morale envers le passé.',
-        currentState: isHero ? 'Débute l’histoire en marge, sans statut ni appui.' : r.role === 'Antagoniste' ? 'Au sommet de son influence, mais contredit pour la première fois.' : 'Vit caché, disponible mais méfiant.',
-        isValidated: false
-      };
-    });
-  }
-
-  Demo.characters = function (p) {
-    const out = makeCharacters(p);
-    const existing = (p.canon && p.canon.characters) || [];
-    out.forEach((c) => { c.isValidated = existing.some((x) => x.name.toLowerCase() === c.name.toLowerCase()); });
-    return out;
-  };
-
-  Demo.world = function (p) {
-    const g = detectProfile(p);
-    const chars = p.characters && p.characters.length ? p.characters : makeCharacters(p);
-    return {
-      rules: g.rules,
-      factions: g.factions,
-      geography: g.geography,
-      socialStructure: g.social,
-      historyLore: g.lore,
-      terminology: g.terms.map((t) => '• ' + t.term + ' — ' + t.def).join('\n'),
-      worldConstraints: g.constraints,
-      locations: g.places.map((pl, i) => ({ id: T.uid('loc'), name: pl.name, description: pl.desc, atmosphere: pl.atmos, orderIndex: i, isValidated: false })),
-      objects: g.objects.map((o, i) => ({ id: T.uid('obj'), name: o.name, significance: o.sig, description: o.desc, ownerCharacterId: chars[i % Math.max(1, chars.length)] ? chars[i % chars.length].id : null, isValidated: false })),
-      isValidated: false
-    };
-  };
-
-  Demo.story = function (p) {
-    const g = detectProfile(p);
-    const a = p.analysis || Demo.analysis(p);
-    const names = (p.characters || []).map((c) => c.name);
-    const hero = names[0] || g.hero;
-    const ant = names.find((_, i) => (p.characters[i] || {}).role === 'Antagoniste') || g.antagonist;
-    return {
-      premise: firstSentence(p.idea, g.conflict),
-      confirmedGenre: a.genrePrincipal || g.label,
-      mainThemes: (a.themesDetectes || g.themes).join(', '),
-      generalTone: a.ton || g.tone,
-      mainConflicts: 'Interne : ' + hero + ' doit accepter de dépendre des autres.\nRelationnel : la confiance entre ' + hero + ' et ' + (names[1] || g.hero2) + ' se construit puis se brise.\nSociétal : ' + g.conflict,
-      mainPlot: 'Acte I — ' + hero + ' découvre que ' + g.stakes.charAt(0).toLowerCase() + g.stakes.slice(1) + '\nActe II — ' + ant + ' propose une solution qui exige un sacrifice inacceptable.\nActe III — ' + hero + ' retourne le prix du sacrifice contre ' + ant + '.',
-      subPlots: '• La dette morale du mentor envers le passé.\n• Le passé effacé que chacun préfère ne pas nommer.\n• Le groupe secondaire qui apprend à survivre sans les héros.',
-      narrativeDirection: 'Climax : ' + g.stakes + ' Promesse finale : une victoire qui coûte quelque chose de définitif.',
-      pacing: 'Rythme en dents de scie : deux chapitres de tension, un chapitre de respiration, une révélation tous les cinq chapitres.',
-      timelineEvents: [
-        { id: T.uid('evt'), orderIndex: 1, title: 'L’événement fondateur', description: g.lore, dateOrEpoch: 'Il y a plusieurs années', isValidated: false },
-        { id: T.uid('evt'), orderIndex: 2, title: 'Le basculement', description: g.conflict, dateOrEpoch: 'Un an avant le chapitre 1', isValidated: false },
-        { id: T.uid('evt'), orderIndex: 3, title: 'Le point de rupture', description: 'Ce qui rend le chapitre 1 inévitable : ' + g.stakes, dateOrEpoch: 'Chapitre 1', isValidated: false }
-      ],
-      isValidated: false
-    };
-  };
-
-  Demo.visual = function (p) {
-    const g = detectProfile(p);
-    return Object.assign({ isValidated: false }, g.visual);
-  };
-
-  Demo.humor = function (p) {
-    const g = detectProfile(p);
-    const chars = (p.characters || []).slice(0, 2);
-    return {
-      humorStyle: g.humor.style,
-      chibiMomentsAllowed: true,
-      runningGags: g.humor.gags,
-      punchlineFrequency: g.humor.freq,
-      characterHumorHooks: chars.map((c) => '• ' + c.name + ' : ' + g.humor.hooks).join('\n') || '• ' + g.hero + ' : ' + g.humor.hooks,
-      comicSituations: g.humor.situations,
-      isValidated: false
-    };
-  };
-
-  Demo.chapter = function (p, number) {
-    const g = detectProfile(p);
-    const chars = (p.characters || []).map((c) => c.name);
-    const hero = chars[0] || g.hero;
-    const ally = chars[1] || g.hero2;
-    const ant = chars.find((_, i) => (p.characters[i] || {}).role === 'Antagoniste') || g.antagonist;
-    const locs = ((p.world && p.world.locations) || g.places.map((x) => ({ name: x.name })));
-    const a = p.analysis || Demo.analysis(p);
-    const num = number || 1;
-    return {
-      id: T.uid('chap'),
-      number: num,
-      title: num === 1 ? 'Le seuil' : 'Chapitre ' + num,
-      synopsis: 'Ce que ' + hero + ' croyait stable se fissure : ' + g.stakes.charAt(0).toLowerCase() + g.stakes.slice(1),
-      isCanon: false,
-      scenes: [
-        {
-          id: T.uid('scene'), orderIndex: 1, title: 'Le monde normal',
-          locationName: locs[0].name || g.places[0].name,
-          charactersPresent: [hero, ally],
-          summary: hero + ' vaque à ses occupations en masquant un problème qu’il croit personnel. ' + ally + ' remarque le détail que personne d’autre ne voit.',
-          beats: ['Ouverture sur un geste quotidien devenu inquiétant.', 'Le dialogue anodin qui dit tout de travers.', 'Un indice que le spectateur comprend avant le héros.'],
-          atmosphere: g.places[0].atmos, emotionalArc: 'Banalité → tension sourde', pacingNotes: 'Cases larges, peu de texte, laisser respirer.',
-          detail: null, panels: [], isValidated: false
-        },
-        {
-          id: T.uid('scene'), orderIndex: 2, title: 'L’irruption',
-          locationName: locs[1] ? locs[1].name : g.places[1].name,
-          charactersPresent: [hero, ant],
-          summary: ant + ' apparaît avec une proposition raisonnable qui contient une menace implicite. ' + hero + ' refuse trop vite et révèle son point faible.',
-          beats: ['Arrivée décalée, cadrée de loin.', 'La proposition formulée comme un service.', 'Le refus qui sonne comme un aveu.'],
-          atmosphere: g.places[1].atmos, emotionalArc: 'Surprise → colère contenue', pacingNotes: 'Champ/contrechamp serré, ellipses courtes.',
-          detail: null, panels: [], isValidated: false
-        },
-        {
-          id: T.uid('scene'), orderIndex: 3, title: 'La décision',
-          locationName: locs[2] ? locs[2].name : g.places[2].name,
-          charactersPresent: [hero],
-          summary: hero + ' retourne seul sur les lieux et prend la décision qui engage tout le récit : ' + g.conflict,
-          beats: ['Plan large qui isole le personnage.', 'L’objet symbolique change de main.', 'Dernière case : regard caméra ou hors-champ.'],
-          atmosphere: g.places[2].atmos, emotionalArc: 'Doute → résolution froide', pacingNotes: 'Une grande case finale, presque sans dialogue.',
-          detail: null, panels: [], isValidated: false
-        }
-      ],
-      _genre: (a && a._genreId) || g.id
-    };
-  };
-
-  Demo.sceneDetail = function (p, scene) {
-    const g = detectProfile(p);
-    return {
-      enrichedSummary: scene.summary + ' Le cadrage privilégie l’isolement du personnage, puis la proximité de l’objet qui déclenche la scène.',
-      pacingNotes: scene.pacingNotes || 'Alterner cases larges et inserts rapides.',
-      emotionalArc: scene.emotionalArc || 'Neutre → décision',
-      detailedNarrativeBeats: (scene.beats || []).concat([
-        'Insert sur les mains : ce que le personnage ne dit pas.',
-        'Un tiers coupe la scène trop tôt, laissant la réplique en suspens.'
-      ]),
-      atmosphereAndSensory: scene.atmosphere + '. Sons proches, arrière-plan légèrement flou, poussière visible dans la lumière.',
-      characterInteractions: 'La distance physique raconte le rapport de force. Aucun contact visuel direct jusqu’au dernier beat.'
-    };
-  };
-
-  Demo.panels = function (p, scene) {
-    const g = detectProfile(p);
-    const chars = scene.charactersPresent || [];
-    const hero = chars[0] || g.hero;
-    const other = chars[1] || '';
-    const place = scene.locationName || g.places[0].name;
-    const rng = T.rngFor(scene.id + 'panels');
-    const cameras = ['Plan large', 'Plan moyen', 'Gros plan', 'Contre-plongée', 'Plongée', 'Plan d’ensemble'];
-    const emotions = ['Tension', 'Détermination', 'Surprise', 'Méfiance', 'Tristesse contenue'];
-    const actions = [
-      hero + ' s’arrête net au milieu du passage, une main déjà levée.',
-      'Le visage de ' + hero + ' se ferme à la seconde où ' + (other || 'l’interlocuteur') + ' prononce le nom interdit.',
-      'Insert : l’objet passe de main en main, trop lentement pour être anodin.',
-      'Le décor se révèle derrière ' + hero + ', plus vaste et plus menaçant que prévu.'
-    ];
-    const sfx = ['BAM', 'TAP', 'CRRR', 'SOUFFLE', 'CLAC'];
-    return actions.map((act, i) => {
-      const cam = cameras[(i + Math.floor(rng() * 3)) % cameras.length];
-      const emo = emotions[i % emotions.length];
-      return {
-        id: T.uid('panel'),
-        orderIndex: i + 1,
-        charactersPresent: i === 0 ? hero : chars.join(' et '),
-        location: place,
-        actionDescription: act,
-        dominantEmotion: emo,
-        cameraAngle: cam,
-        composition: i === 0 ? 'Personnage décentré à droite, espace négatif à gauche' : 'Ligne de fuite vers le fond, personnage sur le tiers gauche',
-        lightingAndAtmosphere: 'Lumière ' + (i % 2 ? 'rasante et froide' : 'diffuse et chaude') + ', contraste marqué, ' + g.places[i % g.places.length].atmos.toLowerCase(),
-        backgroundDetails: g.places[i % g.places.length].desc,
-        visualEffects: i === 2 ? 'Traînée de mouvement discrète, particules en suspension' : 'Tramage dense dans les ombres, halo léger',
-        visualPrompt: 'Webtoon panel, ' + g.visual.artStyle + ', ' + cam.toLowerCase() + ', ' + act + ' Lieu : ' + place + '. Ambiance : ' + g.places[i % g.places.length].atmos + '. Palette : ' + g.visual.palette + '. Éclairage : ' + g.visual.lighting + '. Sans aucun texte, sans bulle, sans logo.',
-        continuityNotes: i === 0 ? 'Premier panel de la scène : établir la tenue exacte.' : 'Conserver la tenue et l’état de ' + hero + ' du panel ' + i + '.',
-        soundEffects: i === 2 ? T.pick(rng, sfx) : null,
-        artSeed: scene.id + ':' + i,
-        isValidated: false
-      };
-    });
-  };
-
-  Demo.dialogues = function (p, panel) {
-    const g = detectProfile(p);
-    const chars = String(panel.charactersPresent || '').split(/ et |,/).map((s) => s.trim()).filter(Boolean);
-    const hero = chars[0] || g.hero;
-    const other = chars[1] || g.antagonist;
-    return [
-      { id: T.uid('dlg'), speakerName: other, type: 'SPEECH', emotion: panel.dominantEmotion || 'Neutre', placement: 'TOP_RIGHT', text: 'Tu crois encore que c’est toi qui décides ?' },
-      { id: T.uid('dlg'), speakerName: hero, type: 'THOUGHT', emotion: 'Méfiance', placement: 'TOP_LEFT', text: 'Il sait. Il sait depuis le début.' },
-      { id: T.uid('dlg'), speakerName: hero, type: 'SHOUT', emotion: 'Colère', placement: 'BOTTOM_LEFT', text: 'Alors dis-le clairement, pour une fois !', soundEffect: panel.soundEffects || 'BAM' }
-    ];
-  };
-
-  Demo.marketing = function (p) {
-    const g = detectProfile(p);
-    const a = p.analysis || Demo.analysis(p);
-    const names = (p.characters || []).map((c) => c.name);
-    const hero = names[0] || g.hero;
-    const baseTitle = (p.title && p.title !== 'Nouveau webtoon' && p.title !== 'Projet démo ToonIA') ? p.title : '';
-    const titles = [baseTitle, 'Le Prix du Silence', 'Fissures', 'Ce que ' + hero + ' a oublié', g.places[0].name].filter(Boolean);
-    const uniq = [...new Set(titles)].slice(0, 4);
-    const premise = firstSentence(p.idea, g.conflict);
-    return {
-      titleProposals: uniq,
-      synopsisVariants: [
-        { lengthType: 'Court', text: premise, tagline: 'Tout finit par se fissurer.' },
-        { lengthType: 'Moyen', text: premise + ' ' + g.conflict + ' Pour ' + hero + ', la seule issue honorable est aussi la plus dangereuse.', tagline: 'Le prix à payer était déjà écrit.' },
-        { lengthType: 'Long', text: premise + '\n\n' + g.conflict + ' ' + g.lore + '\n\n' + hero + ' devra choisir entre la vérité qui détruit et le mensonge qui protège. ' + g.stakes, tagline: 'Certaines vérités coûtent plus cher que le silence.' }
-      ],
-      coverProposal: {
-        composition: 'Plan rapproché en contre-plongée de ' + hero + ' au centre droit, occupant le tiers inférieur ; ' + g.places[0].name + ' en arrière-plan flou sur le tiers supérieur.',
-        charactersPresent: [hero],
-        atmosphereAndLighting: g.visual.lighting + '. Ambiance : ' + (a.ton || g.tone),
-        colorPalette: g.visual.palette,
-        detailedDescriptionNoText: 'Illustration de couverture de webtoon, ' + g.visual.artStyle + '. ' + hero + ' (' + g.look + ') de trois-quarts, regard vers le hors-champ. Décor : ' + g.places[0].desc + ' Composition verticale laissant une zone sombre en haut pour le titre. Palette : ' + g.visual.palette + '. Aucun texte, aucun logo, aucune bulle, aucune typographie dans l’image.'
-      },
-      selectedTitle: uniq[0] || 'Sans titre',
-      selectedSynopsis: premise,
-      selectedTagline: 'Tout finit par se fissurer.',
-      selectedCoverDescription: '',
-      isValidated: false
-    };
-  };
-
-  /* ---------------- client Gemini ---------------- */
+  /* ---------------- client Gemini (proxy serveur) ---------------- */
   const AI = (T.ai = {});
 
-  AI.hasKey = () => !!(T.state && T.state.settings && T.state.settings.apiKey && String(T.state.settings.apiKey).trim());
+  AI.MODELS = [
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3.5-flash',
+    'gemini-2.5-flash',
+    'gemini-2.5-pro',
+    'gemini-2.0-flash'
+  ];
   AI.server = { checked: false, hasKey: false, model: null };
   AI.hasServerKey = () => !!(AI.server && AI.server.hasKey);
-  AI.isDemo = () =>
-    !!(T.state && T.state.settings && T.state.settings.demo) || (!AI.hasKey() && !AI.hasServerKey());
 
   /**
-   * Détecte le proxy /api/gemini du déploiement (clé en variable d'environnement).
-   * Silencieux en cas d'absence : l'app retombe simplement en mode démo.
+   * Interroge /api/config : le proxy lit la variable TOON_IA côté serveur.
+   * Aucune clé n'est jamais manipulée par le navigateur.
    */
   AI.checkServer = async function () {
     try {
       const res = await fetch('/api/config', { cache: 'no-store' });
-      if (res.ok) {
-        const cfg = await res.json();
-        AI.server = { checked: true, hasKey: !!cfg.hasServerKey, model: cfg.model || null };
-        if (cfg.model && !AI.hasKey()) T.state.settings.model = cfg.model;
-      } else {
-        AI.server = { checked: true, hasKey: false, model: null };
-      }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const cfg = await res.json();
+      AI.server = { checked: true, hasKey: !!cfg.hasServerKey, model: cfg.model || null };
+      if (cfg.model) T.state.settings.model = cfg.model;
     } catch (_) {
       AI.server = { checked: true, hasKey: false, model: null };
     }
     return AI.server;
   };
+
+  AI.engineLabel = function () {
+    if (AI.hasServerKey()) return 'Gemini · TOON_IA';
+    if (!AI.server.checked) return 'Gemini · vérification…';
+    return 'Moteur non configuré';
+  };
+
+  const NO_KEY_MESSAGE =
+    'La variable TOON_IA est absente de ce déploiement. Ajoutez-la dans Vercel → Settings → Environment Variables (Production), puis redéployez. La clé reste côté serveur.';
 
   function extractJson(data) {
     const cand = data && data.candidates && data.candidates[0];
@@ -744,40 +456,19 @@
   }
 
   async function callGemini(prompt, schema, temperature) {
-    const key = (T.state.settings.apiKey || '').trim();
-    const useServer = !key && AI.hasServerKey();
-    if (!key && !useServer) {
-      throw new Error('Aucune clé Gemini disponible : passez en mode démo, saisissez une clé locale, ou configurez GEMINI_API_KEY sur le déploiement.');
-    }
+    if (AI.server.checked && !AI.hasServerKey()) throw new Error(NO_KEY_MESSAGE);
     const model = T.state.settings.model || AI.server.model || 'gemini-3.1-flash-lite-preview';
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 90000);
     let res;
 
     try {
-      if (useServer) {
-        // La clé reste sur le serveur : on n'envoie que le prompt et le schéma.
-        res = await fetch('/api/gemini', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: ctrl.signal,
-          body: JSON.stringify({ prompt, schema, temperature: typeof temperature === 'number' ? temperature : 0.9, model })
-        });
-      } else {
-        res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: ctrl.signal,
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: typeof temperature === 'number' ? temperature : 0.9,
-              responseMimeType: 'application/json',
-              responseSchema: schema
-            }
-          })
-        });
-      }
+      res = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: ctrl.signal,
+        body: JSON.stringify({ prompt, schema, temperature: typeof temperature === 'number' ? temperature : 0.9, model })
+      });
     } catch (e) {
       clearTimeout(timer);
       if (e.name === 'AbortError') throw new Error('Délai dépassé (90 s) : Gemini n’a pas répondu.');
@@ -787,8 +478,11 @@
 
     const data = await res.json().catch(() => null);
     if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('Proxy /api/gemini introuvable. Ouvrez le site déployé sur Vercel : la clé TOON_IA y est lue côté serveur.');
+      }
       const msg = data && data.error && data.error.message ? data.error.message : 'HTTP ' + res.status;
-      const err = new Error((useServer ? 'Proxy : ' : 'Gemini : ') + msg);
+      const err = new Error(msg);
       err.status = res.status;
       throw err;
     }
@@ -881,6 +575,14 @@
       },
       required: ['title', 'synopsis', 'scenes']
     },
+    sceneDetail: {
+      type: 'OBJECT',
+      properties: {
+        enrichedSummary: S.str, pacingNotes: S.str, emotionalArc: S.str,
+        detailedNarrativeBeats: S.list, atmosphereAndSensory: S.str, characterInteractions: S.str
+      },
+      required: ['enrichedSummary', 'pacingNotes', 'emotionalArc', 'detailedNarrativeBeats', 'atmosphereAndSensory', 'characterInteractions']
+    },
     panels: {
       type: 'OBJECT',
       properties: {
@@ -929,125 +631,130 @@
   };
 
   function projectBrief(p) {
-    const a = p.analysis || Demo.analysis(p);
-    return 'PROJET : ' + p.title + '\nIDÉE : ' + p.idea + '\nGENRE : ' + a.genrePrincipal + '\nTON : ' + a.ton + '\nTHÈMES : ' + (a.themesDetectes || []).join(', ') + '\n' + canonContext(p);
+    const a = p.analysis || {};
+    return 'PROJET : ' + p.title + '\nBRIEF DE L’AUTEUR :\n' + p.idea + '\nGENRE : ' + (a.genrePrincipal || '') + '\nTON : ' + (a.ton || '') +
+      '\nTHÈMES : ' + ((a.themesDetectes || []).join(', ')) + '\n' + canonContext(p);
   }
 
   AI.analyze = async function (p) {
-    const base = Demo.analysis(p);
-    if (AI.isDemo()) return base;
     const adv = p.advanced || {};
     const advTxt = Object.keys(adv).filter((k) => adv[k]).map((k) => k + '=' + adv[k]).join('\n') || '(aucun)';
-    const prompt = 'Tu es analyste narratif pour un studio de webtoon. Analyse l’idée et renvoie un JSON strict.\n\nTITRE : ' + p.title + '\nIDÉE :\n' + p.idea + '\n\nDÉTAILS AVANCÉS :\n' + advTxt + '\n\nRÈGLES :\n- genrePrincipal : un genre principal court.\n- sousGenres : 2 à 4 sous-genres.\n- ton : description courte du ton narratif.\n- themesDetectes : 3 à 5 thèmes présents dans l’idée.\n- elementsNarratifsExplicites : ce que l’auteur a explicitement posé (repris fidèlement, sans invention).\n- ambiguitesAClarifier : 2 à 5 questions précises à poser à l’auteur. Ne pas inventer de réponse.\n- Ne corrige pas l’idée, ne complète pas les vides. Français.';
+    const prompt = 'Tu es analyste narratif pour un studio de webtoon. Analyse le brief et renvoie un JSON strict.\n\nTITRE : ' + p.title +
+      '\nBRIEF :\n' + p.idea + '\n\nDÉTAILS AVANCÉS :\n' + advTxt +
+      '\n\nRÈGLES :\n- genrePrincipal : un genre principal court.\n- sousGenres : 2 à 4 sous-genres.\n- ton : description courte du ton narratif.\n- themesDetectes : 3 à 5 thèmes présents dans le brief.\n- elementsNarratifsExplicites : ce que l’auteur a explicitement posé (repris fidèlement, sans invention).\n- ambiguitesAClarifier : 2 à 5 questions précises à poser à l’auteur. Ne pas inventer de réponse.\n- Ne corrige pas le brief, ne complète pas les vides.\n- Réponds en français.';
     const out = await callGemini(prompt, SCHEMAS.analysis, 0.6);
-    return Object.assign(base, out, { _genreId: base._genreId });
+    if (!out || !out.genrePrincipal) throw new Error('Analyse incomplète renvoyée par Gemini.');
+    return Object.assign({}, out, { _genreId: T.profile(p).id });
   };
 
   AI.characters = async function (p) {
-    const base = Demo.characters(p);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nTÂCHE : construis la Character Bible (3 à 5 personnages) en respectant strictement le canon validé. Chaque personnage doit être visuellement et psychologiquement distinct, et cohérent avec les noms déjà utilisés. Décris l’apparence physique avec les couleurs de cheveux et d’yeux (indispensable pour la continuité). Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nTÂCHE : construis la Character Bible (3 à 5 personnages) en respectant strictement le canon validé et les personnages déjà nommés dans le brief. Chaque personnage doit être visuellement et psychologiquement distinct. Décris l’apparence physique avec les couleurs de cheveux et d’yeux (indispensable pour la continuité). Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.characters, 0.9);
-    if (!out.characters || !out.characters.length) return base;
-    return out.characters.map((c, i) => Object.assign({}, base[i % base.length], c, { id: T.uid('char'), isValidated: false }));
+    if (!out || !Array.isArray(out.characters) || !out.characters.length) throw new Error('Aucun personnage renvoyé par Gemini.');
+    return out.characters.map((c) => Object.assign({}, c, { id: T.uid('char'), isValidated: false }));
   };
 
   AI.world = async function (p) {
-    const base = Demo.world(p);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nTÂCHE : construis la World Bible. Règles du monde contraignantes et applicables, factions, géographie, structure sociale, lore, terminologie (liste à puces), contraintes. Puis 3 lieux et 2 objets narratifs liés aux personnages validés. Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nTÂCHE : construis la World Bible. Règles du monde contraignantes et applicables, factions, géographie, structure sociale, lore, terminologie (liste à puces), contraintes. Puis 3 lieux et 2 objets narratifs liés aux personnages. Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.world, 0.9);
-    return Object.assign(base, out, {
-      locations: (out.locations || base.locations).map((l) => Object.assign({ id: T.uid('loc'), isValidated: false }, l)),
-      objects: (out.objects || base.objects).map((o) => Object.assign({ id: T.uid('obj'), ownerCharacterId: null, isValidated: false }, o)),
+    if (!out || !out.rules) throw new Error('World Bible incomplète renvoyée par Gemini.');
+    return Object.assign({}, out, {
+      locations: (out.locations || []).map((l, i) => Object.assign({}, l, { id: T.uid('loc'), orderIndex: i, isValidated: false })),
+      objects: (out.objects || []).map((o) => Object.assign({}, o, { id: T.uid('obj'), ownerCharacterId: null, isValidated: false })),
       isValidated: false
     });
   };
 
   AI.story = async function (p) {
-    const base = Demo.story(p);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nTÂCHE : construis la Story Bible. Prémisse fidèle à l’idée, thèmes, ton, conflits (interne/relationnel/sociétal), intrigue principale en 3 actes, sous-intrigues, climax et promesse finale, rythme. Puis 3 événements fondateurs antérieurs au chapitre 1. Ne contredis aucun fait canonique. Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nTÂCHE : construis la Story Bible. Prémisse fidèle au brief, thèmes, ton, conflits (interne/relationnel/sociétal), intrigue principale en 3 actes, sous-intrigues, climax et promesse finale, rythme. Puis 3 événements fondateurs antérieurs au chapitre 1. Ne contredis aucun fait canonique. Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.story, 0.9);
-    return Object.assign(base, out, {
-      timelineEvents: (out.timelineEvents || base.timelineEvents).map((e, i) => Object.assign({ id: T.uid('evt'), orderIndex: i + 1, isValidated: false }, e)),
+    if (!out || !out.mainPlot) throw new Error('Story Bible incomplète renvoyée par Gemini.');
+    return Object.assign({}, out, {
+      timelineEvents: (out.timelineEvents || []).map((e, i) => Object.assign({}, e, { id: T.uid('evt'), orderIndex: i + 1, isValidated: false })),
       isValidated: false
     });
   };
 
   AI.visualHumor = async function (p) {
-    const base = { visual: Demo.visual(p), humor: Demo.humor(p) };
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nTÂCHE : définis la direction artistique et l’ADN humoristique. Le style doit être compatible avec un webtoon à défilement vertical. L’humour doit rester cohérent avec le ton (si le récit est tragique, pas de burlesque gratuit). Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nTÂCHE : définis la direction artistique et l’ADN humoristique. Le style doit être compatible avec un webtoon à défilement vertical. L’humour doit rester cohérent avec le ton (si le récit est tragique, pas de burlesque gratuit). Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.visualHumor, 0.9);
-    return { visual: Object.assign(base.visual, out.visual || {}, { isValidated: false }), humor: Object.assign(base.humor, out.humor || {}, { isValidated: false }) };
+    if (!out || !out.visual || !out.humor) throw new Error('Direction artistique incomplète renvoyée par Gemini.');
+    return {
+      visual: Object.assign({}, out.visual, { isValidated: false }),
+      humor: Object.assign({}, out.humor, { isValidated: false })
+    };
   };
 
   AI.chapter = async function (p, number) {
-    const base = Demo.chapter(p, number);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nTÂCHE : écris le script du chapitre ' + number + '. 3 à 5 scènes, chacune avec lieu canonique, personnages présents, résumé d’action et 3 à 5 beats narratifs. Pas encore de découpage en panels. Le chapitre doit faire avancer l’intrigue principale sans contredire le canon. Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nCHAPITRES DÉJÀ ÉCRITS : ' + ((p.chapters || []).length ? (p.chapters || []).map((c) => c.number + '. ' + c.title).join(' / ') : '(aucun)') +
+      '\n\nTÂCHE : écris le script du chapitre ' + number + '. 3 à 5 scènes, chacune avec lieu canonique, personnages présents, résumé d’action et 3 à 5 beats narratifs. Pas encore de découpage en panels. Le chapitre doit faire avancer l’intrigue principale sans contredire le canon. Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.chapter, 0.95);
+    if (!out || !Array.isArray(out.scenes) || !out.scenes.length) throw new Error('Chapitre vide renvoyé par Gemini.');
     return {
-      id: T.uid('chap'), number, title: out.title || base.title, synopsis: out.synopsis || base.synopsis, isCanon: false,
-      scenes: (out.scenes && out.scenes.length ? out.scenes : base.scenes).map((s, i) => ({
-        id: T.uid('scene'), orderIndex: i + 1, title: s.title, locationName: s.locationName || '', charactersPresent: s.charactersPresent || [],
-        summary: s.summary || '', beats: s.beats || [], atmosphere: s.atmosphere || '', emotionalArc: s.emotionalArc || '',
-        pacingNotes: s.pacingNotes || '', detail: null, panels: [], isValidated: false
+      id: T.uid('chap'),
+      number,
+      title: out.title || 'Chapitre ' + number,
+      synopsis: out.synopsis || '',
+      isCanon: false,
+      scenes: out.scenes.map((s, i) => ({
+        id: T.uid('scene'), orderIndex: i + 1, title: s.title || 'Scène ' + (i + 1),
+        locationName: s.locationName || '', charactersPresent: s.charactersPresent || [],
+        summary: s.summary || '', beats: s.beats || [], atmosphere: s.atmosphere || '',
+        emotionalArc: s.emotionalArc || '', pacingNotes: s.pacingNotes || '',
+        detail: null, panels: [], isValidated: false
       }))
     };
   };
 
+  AI.sceneDetail = async function (p, scene) {
+    const prompt = projectBrief(p) + '\n\nSCÈNE À ENRICHIR :\nTitre : ' + scene.title + '\nLieu : ' + scene.locationName +
+      '\nPersonnages : ' + (scene.charactersPresent || []).join(', ') + '\nRésumé : ' + scene.summary +
+      '\nBeats : ' + (scene.beats || []).join(' | ') +
+      '\n\nTÂCHE : enrichis la mise en scène sans réécrire l’histoire : résumé précisé, rythme, arc émotionnel, 4 à 6 micro-beats, ambiance sensorielle, interactions physiques entre personnages. Réponds en français, JSON strict.';
+    const out = await callGemini(prompt, SCHEMAS.sceneDetail, 0.9);
+    if (!out || !out.enrichedSummary) throw new Error('Enrichissement incomplet renvoyé par Gemini.');
+    return out;
+  };
+
   AI.panels = async function (p, scene) {
-    const base = Demo.panels(p, scene);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nSCÈNE À DÉCOUPER :\nTitre : ' + scene.title + '\nLieu : ' + scene.locationName + '\nPersonnages : ' + (scene.charactersPresent || []).join(', ') + '\nRésumé : ' + scene.summary + '\nBeats : ' + (scene.beats || []).join(' | ') + '\n\nTÂCHE : découpe cette scène en 3 à 6 panels de webtoon vertical. Pour chaque panel : personnages présents avec leur état, lieu, action, émotion dominante, angle de caméra, composition, éclairage/ambiance, arrière-plan, effets visuels, prompt visuel autonome (EN ANGLAIS, SANS TEXTE dans l’image), notes de continuité, onomatopée éventuelle. Français pour les descriptions. JSON strict.';
+    const prompt = projectBrief(p) + '\n\nSCÈNE À DÉCOUPER :\nTitre : ' + scene.title + '\nLieu : ' + scene.locationName +
+      '\nPersonnages : ' + (scene.charactersPresent || []).join(', ') + '\nRésumé : ' + scene.summary +
+      '\nBeats : ' + (scene.beats || []).join(' | ') +
+      (scene.detail ? '\nMise en scène : ' + scene.detail.enrichedSummary + ' | ' + scene.detail.emotionalArc : '') +
+      '\n\nTÂCHE : découpe cette scène en 3 à 6 panels de webtoon vertical. Pour chaque panel : personnages présents avec leur état, lieu, action, émotion dominante, angle de caméra, composition, éclairage/ambiance, arrière-plan, effets visuels, prompt visuel autonome (EN ANGLAIS, SANS TEXTE dans l’image), notes de continuité, onomatopée éventuelle. Français pour les descriptions. JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.panels, 0.95);
-    if (!out.panels || !out.panels.length) return base;
-    return out.panels.map((pn, i) => Object.assign({ id: T.uid('panel'), orderIndex: i + 1, artSeed: scene.id + ':' + i, isValidated: false, soundEffects: null }, pn));
+    if (!out || !Array.isArray(out.panels) || !out.panels.length) throw new Error('Aucun panel renvoyé par Gemini.');
+    return out.panels.map((pn, i) => Object.assign({}, pn, { id: T.uid('panel'), orderIndex: i + 1, artSeed: scene.id + ':' + i, isValidated: false }));
   };
 
   AI.dialogues = async function (p, panel) {
-    const base = Demo.dialogues(p, panel);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nPANEL :\nLieu : ' + panel.location + '\nPersonnages : ' + panel.charactersPresent + '\nAction : ' + panel.actionDescription + '\nÉmotion : ' + panel.dominantEmotion + '\n\nTÂCHE : écris 2 à 4 bulles pour ce panel. Types autorisés : SPEECH, THOUGHT, SHOUT, WHISPER, NARRATION. Placements : TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER. Textes courts (max 140 caractères), naturels, cohérents avec le canon. Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nPANEL :\nLieu : ' + panel.location + '\nPersonnages : ' + panel.charactersPresent +
+      '\nAction : ' + panel.actionDescription + '\nÉmotion : ' + panel.dominantEmotion +
+      '\n\nTÂCHE : écris 2 à 4 bulles pour ce panel. Types autorisés : SPEECH, THOUGHT, SHOUT, WHISPER, NARRATION. Placements : TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER. Textes courts (max 140 caractères), naturels, cohérents avec le canon. Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.dialogues, 0.95);
-    if (!out.dialogues || !out.dialogues.length) return base;
-    return out.dialogues.map((d) => Object.assign({ id: T.uid('dlg') }, d));
+    if (!out || !Array.isArray(out.dialogues) || !out.dialogues.length) throw new Error('Aucune bulle renvoyée par Gemini.');
+    return out.dialogues.map((d) => Object.assign({}, d, { id: T.uid('dlg') }));
   };
 
   AI.marketing = async function (p) {
-    const base = Demo.marketing(p);
-    if (AI.isDemo()) return base;
-    const prompt = projectBrief(p) + '\n\nTÂCHE : packaging éditorial. 3 à 5 propositions de titre (courtes, mémorables). 3 synopsis (Court 1-2 phrases, Moyen 1 paragraphe, Long 2 paragraphes) avec une tagline pour chacun. Une description de couverture détaillée SANS AUCUN TEXTE dans l’image (composition, personnages, ambiance, palette), le titre sera superposé par l’application. Ne contredis pas le canon. Français, JSON strict.';
+    const prompt = projectBrief(p) + '\n\nTÂCHE : packaging éditorial. 3 à 5 propositions de titre (courtes, mémorables). 3 synopsis (Court 1-2 phrases, Moyen 1 paragraphe, Long 2 paragraphes) avec une tagline pour chacun. Une description de couverture détaillée SANS AUCUN TEXTE dans l’image (composition, personnages, ambiance, palette), le titre sera superposé par l’application. Ne contredis pas le canon. Réponds en français, JSON strict.';
     const out = await callGemini(prompt, SCHEMAS.marketing, 1.0);
-    return Object.assign(base, out, {
-      selectedTitle: (out.titleProposals && out.titleProposals[0]) || base.selectedTitle,
-      selectedSynopsis: (out.synopsisVariants && out.synopsisVariants[1] && out.synopsisVariants[1].text) || base.selectedSynopsis,
-      selectedTagline: (out.synopsisVariants && out.synopsisVariants[0] && out.synopsisVariants[0].tagline) || base.selectedTagline,
+    if (!out || !Array.isArray(out.titleProposals) || !out.titleProposals.length) throw new Error('Packaging incomplet renvoyé par Gemini.');
+    const synopsis = out.synopsisVariants || [];
+    return Object.assign({}, out, {
+      selectedTitle: out.titleProposals[0],
+      selectedSynopsis: (synopsis[1] && synopsis[1].text) || (synopsis[0] && synopsis[0].text) || p.idea,
+      selectedTagline: (synopsis[0] && synopsis[0].tagline) || '',
       selectedCoverDescription: (out.coverProposal && out.coverProposal.detailedDescriptionNoText) || '',
       isValidated: false
     });
   };
 
   AI.testKey = async function () {
-    const key = (T.state.settings.apiKey || '').trim();
-    if (!key && AI.hasServerKey()) {
-      const res = await fetch('/api/gemini', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: 'Réponds uniquement : OK', temperature: 0 })
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error((data && data.error && data.error.message) || 'HTTP ' + res.status);
-      return true;
-    }
-    if (!key) throw new Error('Aucune clé à tester.');
-    const model = T.state.settings.model || 'gemini-3.1-flash-lite-preview';
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key), {
+    const res = await fetch('/api/gemini', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'Réponds uniquement : OK' }] }], generationConfig: { maxOutputTokens: 5 } })
+      body: JSON.stringify({ prompt: 'Réponds uniquement : OK', temperature: 0 })
     });
     const data = await res.json().catch(() => null);
     if (!res.ok) throw new Error((data && data.error && data.error.message) || 'HTTP ' + res.status);
