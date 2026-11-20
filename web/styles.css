@@ -971,3 +971,28 @@ button.chip:hover { background: rgba(109, 75, 216, 0.3); border-color: var(--vio
 @media print {
   .job-dock, .skip-link, .sidebar-scrim { display: none !important; }
 }
+
+/* ---------- Échec de génération persistant ---------- */
+.job-card.is-error {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: linear-gradient(160deg, #2a1524, #140d16);
+}
+.job-live.is-error { color: #fca5a5; }
+.job-error {
+  margin-top: 8px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.42);
+  background: rgba(239, 68, 68, 0.1);
+  color: #fecaca;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.job-step.is-failed { color: #fca5a5; }
+.job-step.is-failed .dot { border-color: rgba(239, 68, 68, 0.6); color: #fca5a5; }
+.job-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+@media (max-width: 820px) {
+  .toast-wrap { top: 62px; bottom: auto; }
+}

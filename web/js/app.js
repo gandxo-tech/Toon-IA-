@@ -141,19 +141,26 @@
   async function run(key, fn) {
     T.busy = key;
     T.lastError = null;
+    if (T.job && T.job.state === 'error') T.job = null;
     render({ keepScroll: true });
     startJobTicker();
     try {
       await fn();
       T.retry = null;
+      T.job = null;
     } catch (e) {
       T.lastError = e && e.message ? e.message : String(e);
       T.retry = fn;
+      // L'échec reste affiché (accueil + dock) au lieu de disparaître avec le toast.
+      if (T.job) {
+        T.job.state = 'error';
+        T.job.error = T.lastError;
+        T.job.endedAt = Date.now();
+      }
       T.toast('Échec de la génération', 'error');
     } finally {
       stopJobTicker();
       T.busy = null;
-      T.job = null;
       T.save();
       render({ keepScroll: true });
     }
@@ -654,7 +661,8 @@
     'apply-brief-preset': (el) => { closeModal(); applyBriefPreset(el.dataset.preset); },
     'close-modal': () => closeModal(),
     'confirm-pending': () => { const fn = pendingConfirm; closeModal(); if (fn) fn(); },
-    'clear-error': () => { T.lastError = null; render(); },
+    'clear-error': () => { T.lastError = null; if (T.job && T.job.state === 'error') T.job = null; render(); },
+    'dismiss-job': () => { T.job = null; render({ keepScroll: true }); },
     'retry-last': () => { if (T.retry) run('retry', T.retry); },
 
     'new-project': () => {

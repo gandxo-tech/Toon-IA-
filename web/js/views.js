@@ -102,8 +102,8 @@
   function jobStepsHtml(job) {
     const steps = (job && job.steps) || [];
     return '<ol class="job-steps">' + steps.map((s) => {
-      const state = s.state === 'done' ? 'done' : s.state === 'active' ? 'active' : 'pending';
-      const ico = state === 'done' ? '✓' : state === 'active' ? '<span class="spinner" style="width:10px;height:10px;border-width:1.5px"></span>' : '·';
+      const state = s.state === 'done' ? 'done' : s.state === 'active' ? (job && job.state === 'error' ? 'failed' : 'active') : 'pending';
+      const ico = state === 'done' ? '✓' : state === 'failed' ? '✕' : state === 'active' ? '<span class="spinner" style="width:10px;height:10px;border-width:1.5px"></span>' : '·';
       return '<li class="job-step is-' + state + '"><span class="dot">' + ico + '</span><span>' + esc(s.label) + '</span></li>';
     }).join('') + '</ol>';
   }
@@ -112,21 +112,31 @@
   Views.jobPanel = function (job, opts) {
     if (!job) return '';
     const dock = !!(opts && opts.dock);
-    const folded = !!(dock && T.ui && T.ui.jobFolded);
+    const failed = job.state === 'error';
+    const folded = !!(dock && !failed && T.ui && T.ui.jobFolded);
     const steps = job.steps || [];
     const done = steps.filter((s) => s.state === 'done').length;
     const pct = Math.round((done / Math.max(steps.length, 1)) * 100);
     const secs = ((job.endedAt || Date.now()) - (job.startedAt || Date.now())) / 1000;
-    return '<section class="job-card" role="status" aria-live="polite">' +
-      '<div class="job-head"><span class="job-live"><span class="job-pulse"></span>Génération</span>' +
+    return '<section class="job-card' + (failed ? ' is-error' : '') + '" role="status" aria-live="' + (failed ? 'assertive' : 'polite') + '">' +
+      '<div class="job-head"><span class="job-live' + (failed ? ' is-error' : '') + '">' +
+        (failed ? '⚠ Génération interrompue' : '<span class="job-pulse"></span>Génération') + '</span>' +
         '<span class="job-timer">' + fmtTime(secs) + '</span>' +
-        (dock ? '<button type="button" class="job-fold" data-action="toggle-job" aria-label="' + (T.ui && T.ui.jobFolded ? 'Déplier' : 'Réduire') + '">' + (T.ui && T.ui.jobFolded ? '+' : '−') + '</button>' : '') +
+        (dock && !failed ? '<button type="button" class="job-fold" data-action="toggle-job" aria-label="' + (T.ui && T.ui.jobFolded ? 'Déplier' : 'Réduire') + '">' + (T.ui && T.ui.jobFolded ? '+' : '−') + '</button>' : '') +
       '</div>' +
       '<div class="job-now">' + esc(job.label || 'Préparation…') + '</div>' +
-      (job.detail ? '<div class="job-detail">' + esc(job.detail) + '</div>' : '') +
+      (failed
+        ? '<div class="job-error">' + esc(job.error || 'La génération s’est arrêtée avant la fin.') + '</div>'
+        : (job.detail ? '<div class="job-detail">' + esc(job.detail) + '</div>' : '')) +
       '<div class="job-bar"><span style="width:' + pct + '%"></span></div>' +
       '<div class="job-meta"><span>' + done + ' / ' + Math.max(steps.length, 1) + ' phases</span><span>' + pct + ' %</span></div>' +
       (folded ? '' : jobStepsHtml(job)) +
+      (failed
+        ? '<div class="job-actions">' +
+            '<button type="button" class="btn btn-primary btn-sm" data-action="retry-last">↻ Réessayer</button>' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-action="' + (dock ? 'dismiss-job' : 'clear-error') + '">' + (dock ? 'Masquer' : 'Fermer') + '</button>' +
+          '</div>'
+        : '') +
       '</section>';
   };
 
@@ -171,7 +181,7 @@
       (missing
         ? '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>TOON_IA absente de ce déploiement</h4><p>Ajoutez la variable <span class="mono">TOON_IA</span> dans Vercel (Production) puis redéployez : sans elle, aucune génération n’est possible.</p></div></div>'
         : '') +
-      '<div id="job-inline-host">' + Views.jobPanel(job) + '</div>' +
+      '<div id="job-inline-host">' + (job ? Views.jobPanel(job) : (T.lastError ? errorBlock() : '')) + '</div>' +
       '</div>';
   }
 
