@@ -440,8 +440,7 @@
   AI.MODELS = [
     'gemini-3.1-flash-lite-preview',
     'gemini-3.5-flash',
-    'gemini-3.8-flash',
-    'gemini-3.1-pro-preview'
+    'gemini-3.8-flash'
   ];
   AI.server = { checked: false, hasKey: false, model: null };
   AI.hasServerKey = () => !!(AI.server && AI.server.hasKey);
