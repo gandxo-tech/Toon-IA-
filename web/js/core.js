@@ -399,11 +399,40 @@
     if (!wrap) return;
     const el = document.createElement('div');
     el.className = 'toast' + (kind === 'error' ? ' is-error' : kind === 'ok' ? ' is-ok' : '');
-    el.textContent = msg;
+    const ico = document.createElement('span');
+    ico.className = 't-ico';
+    ico.textContent = kind === 'error' ? '⚠' : kind === 'ok' ? '✓' : '✦';
+    const txt = document.createElement('span');
+    txt.textContent = msg;
+    el.appendChild(ico);
+    el.appendChild(txt);
     wrap.appendChild(el);
-    setTimeout(() => { el.style.transition = 'opacity .25s'; el.style.opacity = '0'; }, 2600);
-    setTimeout(() => el.remove(), 3000);
+    while (wrap.children.length > 3) wrap.removeChild(wrap.firstChild);
+    setTimeout(() => { el.style.transition = 'opacity .25s'; el.style.opacity = '0'; }, 3400);
+    setTimeout(() => el.remove(), 3800);
   };
+
+  /* Amorces de brief proposées sur l'accueil : texte libre, modifiable ensuite. */
+  T.briefPresets = [
+    {
+      id: 'thriller',
+      label: 'Thriller portuaire',
+      title: 'Les Fissures du quai',
+      idea: 'Thriller psychologique dans une ville portuaire française de 1990. Sujet : une inspectrice en disgrâce, revenue après dix ans d’exil, enquête sur trois disparitions que sa hiérarchie veut enterrer. Elle reconnaît sur une photo un homme qu’elle croyait mort. Ton : pluie, néons, culpabilité, dialogues secs. Personnages : l’inspectrice obstinée, un journaliste idéaliste, un docker au passé trouble. Ambiance : polar âpre, cliffhangers en fin de chapitre. Fin : la vérité coûte sa carrière à l’héroïne. 3 chapitres, palette bleu acier et sodium.'
+    },
+    {
+      id: 'fantasy',
+      label: 'Fantasy sombre',
+      title: 'La Bibliothèque des oublis',
+      idea: 'Fantasy sombre dans un empire où la magie se paie en souvenirs. Sujet : une archiviste découvre qu’elle a vendu son enfance pour sauver sa sœur, devenue impératrice. Ton : mélancolique et grandiose. Personnages : l’archiviste, la sœur impératrice, un garde qui collectionne les souvenirs volés. Ambiance : bibliothèques immenses, cérémonies, neige. Contraintes : pas de voyage temporel. Arc : récupérer sa mémoire sans détruire l’empire. 2 chapitres, palette violet profond, or et blanc.'
+    },
+    {
+      id: 'romance',
+      label: 'Romance douce-amère',
+      title: 'Service de nuit',
+      idea: 'Romance douce-amère dans un petit restaurant de quartier menacé de fermeture. Sujet : deux anciens amis d’enfance se retrouvent, l’un cuisinier, l’autre critique gastronomique envoyée pour l’évaluer. Ton : chaleureux, drôle, quelques larmes. Personnages : le cuisinier taciturne, la critique brillante et blessée, la grand-mère qui tient les comptes. Ambiance : cuisine la nuit, marchés, pluie sur les vitres. Contraintes : pas de triangle amoureux. Fin : le restaurant sauvé, la relation à reconstruire. 2 chapitres, palette crème, rouge tomate, vert basilic.'
+    }
+  ];
 
   /* ---------------- client Gemini (proxy serveur) ---------------- */
   const AI = (T.ai = {});

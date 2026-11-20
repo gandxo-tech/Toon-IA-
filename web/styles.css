@@ -724,3 +724,250 @@ p { margin: 0 0 12px; }
   .reader { border: 0; border-radius: 0; max-width: 100%; }
   .print-page { page-break-after: always; }
 }
+
+/* =========================================================
+   UX 2.0 — accessibilité, brief, génération en direct
+   ========================================================= */
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -64px;
+  z-index: 300;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--violet-deep);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: top 0.18s ease;
+}
+.skip-link:focus { top: 16px; }
+
+.sidebar-scrim { display: none; }
+
+.btn-lg { padding: 13px 22px; font-size: 14.5px; border-radius: 12px; }
+
+details.card > summary { list-style: none; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--violet);
+  transition: transform 0.15s;
+}
+details.card[open] > summary::before { transform: rotate(90deg); }
+
+/* ---------- Brief unique ---------- */
+.brief-examples {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+button.chip { cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+button.chip:hover { background: rgba(109, 75, 216, 0.3); border-color: var(--violet); }
+.brief-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.brief-meta {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 11.5px;
+  color: var(--muted-2);
+}
+.brief-meta .tiny { padding-bottom: 10px; }
+.tiny.is-warn { color: var(--amber); }
+
+/* ---------- Guide de démarrage ---------- */
+.guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.guide-step {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+}
+.guide-num {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1;
+  min-width: 30px;
+  color: var(--violet);
+}
+.guide-step h4 { margin: 0 0 3px; font-size: 13.5px; }
+.guide-step p { margin: 0; font-size: 12px; color: var(--muted); }
+
+/* ---------- Génération en direct ---------- */
+.job-dock {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 180;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+}
+.job-dock:empty { display: none; }
+
+.job-card {
+  background: linear-gradient(160deg, #221a3b, #120e1f);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 30px 60px -24px #000;
+  padding: 14px 16px;
+  animation: dockIn 0.25s ease-out;
+}
+@keyframes dockIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+}
+.brief-card .job-card {
+  margin-top: 14px;
+  box-shadow: none;
+  animation: none;
+  background: rgba(255, 255, 255, 0.03);
+}
+.brief-card .job-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
+
+.job-head { display: flex; align-items: center; gap: 8px; }
+.job-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.job-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 0 rgba(56, 217, 208, 0.6);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  70% { box-shadow: 0 0 0 8px rgba(56, 217, 208, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(56, 217, 208, 0); }
+}
+.job-timer { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.job-fold {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--muted);
+  line-height: 1;
+  cursor: pointer;
+}
+.job-fold:hover { color: #fff; background: rgba(255, 255, 255, 0.14); }
+.job-now { font-size: 13px; font-weight: 600; margin-top: 8px; overflow-wrap: anywhere; }
+.job-detail { font-size: 11.5px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+.job-bar {
+  height: 6px;
+  margin: 10px 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  overflow: hidden;
+}
+.job-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--violet-deep), var(--cyan));
+  transition: width 0.4s ease;
+}
+.job-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted-2);
+}
+.job-steps {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  max-height: 190px;
+  overflow: auto;
+}
+.job-step { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted-2); }
+.job-step .dot {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  font-size: 9px;
+  line-height: 1;
+}
+.job-step.is-done { color: #d9f7b0; }
+.job-step.is-done .dot { background: rgba(163, 230, 53, 0.18); border-color: rgba(163, 230, 53, 0.5); color: var(--lime); }
+.job-step.is-active { color: #fff; font-weight: 600; }
+.job-step.is-active .dot { border-color: var(--cyan); color: var(--cyan); }
+
+/* ---------- Toasts ---------- */
+.toast { display: flex; align-items: center; gap: 8px; }
+.toast .t-ico { flex: 0 0 auto; font-size: 12px; opacity: 0.9; }
+
+/* ---------- Adaptations ---------- */
+@media (max-width: 1050px) {
+  .guide { grid-template-columns: 1fr; }
+}
+@media (max-width: 820px) {
+  .sidebar-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    background: rgba(5, 3, 10, 0.62);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  body.sidebar-open .sidebar-scrim { opacity: 1; pointer-events: auto; }
+  .job-dock { left: 12px; right: 12px; bottom: 12px; width: auto; }
+  .brief-card .job-steps { grid-template-columns: 1fr; }
+  .brief-foot { align-items: stretch; }
+  .brief-foot .btn-lg { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .job-dock, .skip-link, .sidebar-scrim { display: none !important; }
+}

@@ -92,36 +92,86 @@
   }
 
   /* ---------- brief unique ---------- */
+  const BRIEF_MIN = 40;
+
+  const fmtTime = (secs) => {
+    const s = Math.max(0, Math.round(secs || 0));
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  };
+
+  function jobStepsHtml(job) {
+    const steps = (job && job.steps) || [];
+    return '<ol class="job-steps">' + steps.map((s) => {
+      const state = s.state === 'done' ? 'done' : s.state === 'active' ? 'active' : 'pending';
+      const ico = state === 'done' ? '✓' : state === 'active' ? '<span class="spinner" style="width:10px;height:10px;border-width:1.5px"></span>' : '·';
+      return '<li class="job-step is-' + state + '"><span class="dot">' + ico + '</span><span>' + esc(s.label) + '</span></li>';
+    }).join('') + '</ol>';
+  }
+
+  // Panneau de génération partagé par la carte du brief et le dock flottant.
+  Views.jobPanel = function (job, opts) {
+    if (!job) return '';
+    const dock = !!(opts && opts.dock);
+    const folded = !!(dock && T.ui && T.ui.jobFolded);
+    const steps = job.steps || [];
+    const done = steps.filter((s) => s.state === 'done').length;
+    const pct = Math.round((done / Math.max(steps.length, 1)) * 100);
+    const secs = ((job.endedAt || Date.now()) - (job.startedAt || Date.now())) / 1000;
+    return '<section class="job-card" role="status" aria-live="polite">' +
+      '<div class="job-head"><span class="job-live"><span class="job-pulse"></span>Génération</span>' +
+        '<span class="job-timer">' + fmtTime(secs) + '</span>' +
+        (dock ? '<button type="button" class="job-fold" data-action="toggle-job" aria-label="' + (T.ui && T.ui.jobFolded ? 'Déplier' : 'Réduire') + '">' + (T.ui && T.ui.jobFolded ? '+' : '−') + '</button>' : '') +
+      '</div>' +
+      '<div class="job-now">' + esc(job.label || 'Préparation…') + '</div>' +
+      (job.detail ? '<div class="job-detail">' + esc(job.detail) + '</div>' : '') +
+      '<div class="job-bar"><span style="width:' + pct + '%"></span></div>' +
+      '<div class="job-meta"><span>' + done + ' / ' + Math.max(steps.length, 1) + ' phases</span><span>' + pct + ' %</span></div>' +
+      (folded ? '' : jobStepsHtml(job)) +
+      '</section>';
+  };
+
   const BRIEF_EXAMPLE = 'Ex : Un thriller psychologique dans une ville portuaire de 1990. Sujet : une inspectrice en disgrâce enquête sur trois disparitions que sa hiérarchie veut enterrer. Personnages, ton, ambiances, palette, chapitres, contraintes… écrivez tout ici.';
 
-  function briefCard(p) {
+  function briefCard(p, opts) {
+    const compact = !!(opts && opts.compact);
     const job = T.job;
     const ready = T.ai.hasServerKey();
     const missing = T.ai.server.checked && !ready;
     const chapters = Math.min(3, Math.max(1, Number(T.state.settings.chapters) || 1));
-    const words = p.idea ? p.idea.split(/\s+/).filter(Boolean).length : 0;
-    return '<div class="card" style="margin-bottom:18px">' +
+    const words = p.idea ? p.idea.trim().split(/\s+/).filter(Boolean).length : 0;
+    const len = String(p.idea || '').trim().length;
+    const tooShort = len < BRIEF_MIN;
+    const presets = T.briefPresets || [];
+    const counter = len === 0
+      ? 'Décrivez votre webtoon pour activer la génération'
+      : (tooShort ? 'Encore ' + (BRIEF_MIN - len) + ' caractères minimum' : words + ' mot' + (words > 1 ? 's' : '') + ' · chapitre 1 entièrement découpé');
+    return '<div class="card brief-card"' + (opts && opts.top ? ' style="margin-top:18px"' : '') + '>' +
       '<div class="row-between" style="align-items:flex-start"><div>' +
         '<div class="eyebrow">Brief unique</div>' +
-        '<h2 style="margin:4px 0 6px">Votre gros prompt</h2>' +
-        '<p class="small" style="margin:0;max-width:78ch">Collez votre brief complet. « Générer tout le projet » enchaîne analyse, personnages, univers, histoire, direction artistique, chapitres, storyboard, panels, dialogues et couverture.</p>' +
+        '<h2 style="margin:4px 0 6px">' + (compact ? 'Affiner le brief' : 'Votre gros prompt') + '</h2>' +
+        '<p class="small" style="margin:0;max-width:78ch">' + (compact
+          ? 'Relancez la génération complète après avoir modifié le brief. Les étapes déjà validées du canon sont conservées.'
+          : 'Collez votre brief complet. Un seul bouton enchaîne analyse, personnages, univers, histoire, direction artistique, chapitres, panels, bulles et couverture.') + '</p>' +
       '</div><span class="badge ' + (ready ? 'badge-canon' : 'badge-ai') + '">' + esc(T.ai.engineLabel()) + '</span></div>' +
       '<label class="field" style="margin-top:14px"><span>Brief / prompt</span>' +
-        '<textarea class="textarea textarea-lg" style="min-height:190px" data-bind="idea" data-kind="area" placeholder="' + esc(BRIEF_EXAMPLE) + '">' + esc(p.idea) + '</textarea></label>' +
-      '<div class="row-between" style="gap:12px;flex-wrap:wrap">' +
-        '<div class="row" style="gap:12px;flex-wrap:wrap">' +
+        '<textarea class="textarea' + (compact ? '' : ' textarea-lg') + '" style="min-height:' + (compact ? 120 : 190) + 'px" data-bind="idea" data-kind="area" placeholder="' + esc(BRIEF_EXAMPLE) + '">' + esc(p.idea) + '</textarea></label>' +
+      (presets.length && !compact
+        ? '<div class="brief-examples"><span class="tiny">Amorces rapides :</span>' + presets.map((pr) =>
+            '<button type="button" class="chip chip-add" data-action="brief-preset" data-preset="' + esc(pr.id) + '">' + esc(pr.label) + '</button>').join('') + '</div>'
+        : '') +
+      '<div class="brief-foot" style="margin-top:16px">' +
+        '<div class="brief-meta">' +
           '<label class="field" style="margin:0;min-width:150px"><span>Chapitres à écrire</span><select class="select" data-bind="settings.chapters" data-kind="select">' +
             [1, 2, 3].map((n) => '<option value="' + n + '"' + (chapters === n ? ' selected' : '') + '>' + n + ' chapitre' + (n > 1 ? 's' : '') + '</option>').join('') + '</select></label>' +
-          '<span class="tiny" style="align-self:flex-end;padding-bottom:10px">' + words + ' mot' + (words > 1 ? 's' : '') + ' · le chapitre 1 est entièrement découpé en panels et bulles</span>' +
+          '<span class="tiny' + (tooShort && len > 0 ? ' is-warn' : '') + '">' + esc(counter) + '</span>' +
         '</div>' +
-        '<button class="btn btn-primary" data-action="gen-all"' + (missing ? ' disabled' : '') + '>✦ Générer tout le projet</button>' +
+        '<button type="button" class="btn btn-primary btn-lg" data-action="gen-all"' + (missing || tooShort ? ' disabled' : '') + '>✦ Générer tout le projet</button>' +
       '</div>' +
+      '<p class="tiny" style="margin:10px 0 0">Astuce <span class="mono">⌘ / Ctrl + Entrée</span> lance la génération. Comptez une vingtaine d’appels Gemini selon le nombre de chapitres.</p>' +
       (missing
         ? '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>TOON_IA absente de ce déploiement</h4><p>Ajoutez la variable <span class="mono">TOON_IA</span> dans Vercel (Production) puis redéployez : sans elle, aucune génération n’est possible.</p></div></div>'
         : '') +
-      (job
-        ? '<div class="alert alert-info" style="margin-top:12px"><span class="alert-ico"><span class="spinner"></span></span><div><h4>' + esc(job.label) + '</h4><p>' + job.done + ' / ' + Math.max(job.total, job.done) + ' étapes — laissez l’onglet ouvert.</p><div style="height:6px;background:rgba(255,255,255,.08);border-radius:999px;margin-top:8px;overflow:hidden"><div style="height:100%;width:' + Math.min(100, Math.round((job.done / Math.max(job.total, 1)) * 100)) + '%;background:var(--violet)"></div></div></div></div>'
-        : '') +
+      '<div id="job-inline-host">' + Views.jobPanel(job) + '</div>' +
       '</div>';
   }
 
@@ -132,6 +182,14 @@
     const progress = T.progress(p);
     const doneCount = progress.filter((x) => x.done).length;
     const st = T.stats(p);
+    const started = !!(p.analysis || (p.chapters && p.chapters.length) || String(p.idea || '').trim());
+    const next = progress.find((x) => !x.done) || progress[progress.length - 1];
+    const synopsis = (p.marketing && p.marketing.selectedSynopsis) || (p.story && (p.story.logline || p.story.premisse)) || p.idea || '';
+    const guide = '<div class="guide">' + [
+      ['01', 'Collez votre brief', 'Une prémisse, un ton, des personnages, une fin — même en vrac.'],
+      ['02', 'Générez tout', 'Bibles, chapitres, storyboard, panels et bulles s’enchaînent sans intervention.'],
+      ['03', 'Relisez, validez, exportez', 'Chaque validation entre dans le canon ; les contradictions sont signalées, jamais corrigées en silence.']
+    ].map((g) => '<div class="guide-step"><div class="guide-num">' + g[0] + '</div><div><h4>' + esc(g[1]) + '</h4><p>' + esc(g[2]) + '</p></div></div>').join('') + '</div>';
     const modules = [
       ['projet', 'Idée & genèse', 'Concept, analyse IA, validation'],
       ['personnages', 'Personnages', 'Character Bible, 12 champs'],
@@ -149,22 +207,24 @@
       ['export', 'Export', 'JSON, Markdown, PDF']
     ];
 
-    return head('Studio de webtoon', 'Une idée. Un canon. Un webtoon.', 'Transformez une prémisse en récit structuré : bibles narratives, personnages cohérents, chapitres, panels, dialogues et export — sans jamais corriger une contradiction en silence.', '<button class="btn btn-primary" data-action="new-project">+ Nouveau webtoon</button>') +
-      briefCard(p) +
-      '<div class="hero">' +
-        '<div class="eyebrow">Projet actif</div>' +
-        '<h1>' + esc(p.title) + '</h1>' +
-        '<p>' + esc(p.idea ? T.clamp(p.idea, 240) : 'Aucune idée saisie pour ce projet. Commencez par l’étape « Idée & genèse ».') + '</p>' +
-        '<div class="row">' +
-          '<button class="btn btn-primary" data-action="go" data-route="projet">' + (p.analysis ? 'Reprendre l’analyse' : 'Commencer l’analyse') + ' →</button>' +
-          '<span class="badge">' + doneCount + '/9 étapes</span>' +
-          '<span class="badge ' + (T.ai.hasServerKey() ? 'badge-canon' : 'badge-ai') + '">' + esc(T.ai.engineLabel()) + '</span>' +
-          (p.idea ? '<span class="badge">' + (p.idea.length > 0 ? Math.round(p.idea.split(/\s+/).length) : 0) + ' mots</span>' : '') +
-        '</div>' +
-        '<div class="pipeline">' + progress.map((x) =>
-          '<button class="pipe-step ' + (x.done ? 'is-done' : '') + '" data-action="go" data-route="' + x.key + '"><b>ÉTAPE</b>' + esc(x.label) + '</button>').join('') +
-        '</div>' +
-      '</div>' +
+    return head('Studio de webtoon', 'Une idée. Un canon. Un webtoon.', 'Transformez une prémisse en récit structuré : bibles narratives, personnages cohérents, chapitres, panels, dialogues et export.', '<button type="button" class="btn" data-action="new-project">+ Nouveau webtoon</button>') +
+      (!started
+        ? briefCard(p) + guide
+        : '<div class="hero">' +
+            '<div class="eyebrow">Projet actif · ' + doneCount + '/9 étapes</div>' +
+            '<h1>' + esc(p.title) + '</h1>' +
+            '<p>' + esc(T.clamp(synopsis || 'Votre projet est prêt à démarrer.', 280)) + '</p>' +
+            '<div class="row">' +
+              '<button type="button" class="btn btn-primary" data-action="go" data-route="' + next.key + '">' + (doneCount >= progress.length ? 'Ouvrir le résultat' : 'Continuer : ' + esc(next.label)) + ' →</button>' +
+              '<button type="button" class="btn" data-action="go" data-route="lecture">Lire le webtoon</button>' +
+              '<button type="button" class="btn btn-ghost" data-action="go" data-route="export">Exporter</button>' +
+              '<span class="badge ' + (T.ai.hasServerKey() ? 'badge-canon' : 'badge-ai') + '">' + esc(T.ai.engineLabel()) + '</span>' +
+            '</div>' +
+            '<div class="pipeline">' + progress.map((x) =>
+              '<button type="button" class="pipe-step ' + (x.done ? 'is-done' : '') + '" data-action="go" data-route="' + x.key + '"><b>' + (x.done ? 'FAIT' : 'ÉTAPE') + '</b>' + esc(x.label) + '</button>').join('') +
+            '</div>' +
+          '</div>' +
+          briefCard(p, { compact: true, top: true })) +
 
       '<div class="grid grid-4" style="margin-top:18px">' +
         '<div class="metric"><b>' + st.characters + '</b><span>personnages</span></div>' +

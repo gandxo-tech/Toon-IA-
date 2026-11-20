@@ -13,6 +13,8 @@
 </head>
 <body>
 
+<button type="button" class="skip-link" data-action="skip-content">Aller au contenu</button>
+
 <div class="app">
   <!-- ================= SIDEBAR ================= -->
   <aside class="sidebar" id="sidebar">
@@ -50,10 +52,11 @@
         <button class="nav-item" data-route="canon"><span class="nav-ico">◉</span>Canon Memory<span class="nav-dot is-empty" data-dot="canon"></span></button>
         <button class="nav-item" data-route="lecture"><span class="nav-ico">☰</span>Lecture verticale<span class="nav-dot is-empty" data-dot="lecture"></span></button>
         <button class="nav-item" data-route="export"><span class="nav-ico">↧</span>Export</button>
-        <button class="nav-item" data-route="reglages"><span class="nav-ico">⚙</span>Clé API &amp; moteur</button>
+        <button class="nav-item" data-route="reglages"><span class="nav-ico">⚙</span>Moteur &amp; réglages</button>
       </div>
     </nav>
   </aside>
+  <div class="sidebar-scrim" data-action="closeSidebar" aria-hidden="true"></div>
 
   <!-- ================= MAIN ================= -->
   <div class="main">
@@ -68,14 +71,15 @@
         <span class="tiny">Projet</span>
         <select id="project-select" aria-label="Projet actif"></select>
       </div>
-      <span class="badge badge-ai" id="engine-badge">Gemini · vérification…</span>
+      <button type="button" class="badge badge-ai" id="engine-badge" data-action="go" data-route="reglages" title="Voir l’état du moteur">Gemini · vérification…</button>
     </header>
 
     <main class="view" id="view"></main>
   </div>
 </div>
 
-<div class="toast-wrap" id="toasts"></div>
+<div class="job-dock" id="job-dock" aria-live="polite"></div>
+<div class="toast-wrap" id="toasts" aria-live="polite" aria-atomic="false"></div>
 <div id="modal-root"></div>
 
 <script src="js/core.js"></script>

@@ -28,7 +28,7 @@
     canon: { title: 'Canon Memory', sub: 'Faits validés & contradictions', fn: Views.canon },
     lecture: { title: 'Lecture verticale', sub: 'Format webtoon', fn: Views.lecture },
     export: { title: 'Export', sub: 'JSON, Markdown, PDF', fn: Views.export },
-    reglages: { title: 'Clé API & moteur', sub: 'Configuration locale', fn: Views.reglages }
+    reglages: { title: 'Moteur & réglages', sub: 'Clé serveur, modèle & stockage', fn: Views.reglages }
   };
 
   const DOTS = {
@@ -58,6 +58,29 @@
   function navigate(route) {
     if (location.hash === '#/' + route) render();
     else location.hash = '#/' + route;
+  }
+
+  function setSidebar(open) {
+    const sb = document.getElementById('sidebar');
+    if (sb) sb.classList.toggle('is-open', open);
+    document.body.classList.toggle('sidebar-open', open);
+  }
+
+  /* Dock de génération : reste visible quelle que soit la page ouverte. */
+  function renderJobDock() {
+    const dock = document.getElementById('job-dock');
+    if (!dock) return;
+    if (!T.job) { dock.innerHTML = ''; return; }
+    dock.innerHTML = Views.jobPanel(T.job, { dock: true });
+  }
+
+  let jobTicker = null;
+  function startJobTicker() {
+    stopJobTicker();
+    jobTicker = setInterval(() => { if (T.job) renderJobDock(); }, 1000);
+  }
+  function stopJobTicker() {
+    if (jobTicker) { clearInterval(jobTicker); jobTicker = null; }
   }
 
   /* ---------------- rendu ---------------- */
@@ -103,7 +126,8 @@
     badge.textContent = T.ai.engineLabel();
     badge.className = 'badge ' + (T.ai.hasServerKey() ? 'badge-canon' : 'badge-ai');
 
-    document.getElementById('sidebar').classList.remove('is-open');
+    setSidebar(false);
+    renderJobDock();
 
     if (opts && opts.keepScroll) {
       restoringScroll = true;
@@ -118,6 +142,7 @@
     T.busy = key;
     T.lastError = null;
     render({ keepScroll: true });
+    startJobTicker();
     try {
       await fn();
       T.retry = null;
@@ -126,6 +151,7 @@
       T.retry = fn;
       T.toast('Échec de la génération', 'error');
     } finally {
+      stopJobTicker();
       T.busy = null;
       T.job = null;
       T.save();
@@ -480,85 +506,152 @@
 
     const chapters = Math.min(3, Math.max(1, Number(T.state.settings.chapters) || 1));
     const softErrors = [];
-    const job = (T.job = { label: 'Analyse du brief', done: 0, total: 5 + chapters + 1 });
-    const step = (label) => { job.label = label; render({ keepScroll: true }); };
-    const advance = () => { job.done += 1; };
+    const phases = [
+      ['Analyse du brief', 'Genre, ton, thèmes et ambiguïtés'],
+      ['Character Bible', 'Distribution, apparences et arcs'],
+      ['World Bible', 'Règles, lieux et factions'],
+      ['Story Bible', 'Structure, actes et timeline'],
+      ['Direction artistique', 'Palette, cadrage et Humor DNA'],
+      ['Chapitres', chapters + ' script' + (chapters > 1 ? 's' : '') + ' à écrire'],
+      ['Panels & bulles', 'Découpage du chapitre 1'],
+      ['Couverture', 'Titres, synopsis et visuel'],
+      ['Canon', 'Mémorisation des faits validés']
+    ];
+    const job = (T.job = {
+      startedAt: Date.now(),
+      label: phases[0][0],
+      detail: phases[0][1],
+      steps: phases.map((ph) => ({ label: ph[0], state: 'pending' })),
+      done: 0,
+      total: phases.length
+    });
+    const renderJob = () => {
+      renderJobDock();
+      const host = document.getElementById('job-inline-host');
+      if (host) host.innerHTML = Views.jobPanel(T.job);
+    };
+    const phase = (i, detail) => {
+      job.steps.forEach((s, idx) => { s.state = idx < i ? 'done' : idx === i ? 'active' : 'pending'; });
+      job.done = i;
+      job.label = phases[i] ? phases[i][0] : job.label;
+      job.detail = detail || (phases[i] ? phases[i][1] : '');
+      renderJob();
+    };
     const checkpoint = () => { p.updatedAt = T.now(); T.save(); };
+    const finish = () => {
+      job.steps.forEach((s) => { s.state = 'done'; });
+      job.done = phases.length;
+      job.endedAt = Date.now();
+      renderJob();
+    };
 
-    step('Analyse du brief');
+    phase(0);
     p.analysis = await T.ai.analyze(p);
-    advance(); checkpoint();
+    checkpoint();
 
-    step('Character Bible');
+    phase(1);
     p.characters = await T.ai.characters(p);
-    advance(); checkpoint();
+    checkpoint();
 
-    step('World Bible');
+    phase(2);
     p.world = await T.ai.world(p);
-    advance(); checkpoint();
+    checkpoint();
 
-    step('Story Bible');
+    phase(3);
     p.story = await T.ai.story(p);
-    advance(); checkpoint();
+    checkpoint();
 
-    step('Direction artistique & Humor DNA');
+    phase(4);
     const vh = await T.ai.visualHumor(p);
     p.visual = vh.visual;
     p.humor = vh.humor;
-    advance(); checkpoint();
+    checkpoint();
 
     p.chapters = [];
     let first = null;
     for (let n = 1; n <= chapters; n++) {
-      step('Chapitre ' + n + ' — script');
+      phase(5, 'Chapitre ' + n + ' — écriture du script');
       const ch = await T.ai.chapter(p, n);
       p.chapters.push(ch);
       if (n === 1) first = ch;
-      advance(); checkpoint();
+      checkpoint();
     }
 
     if (first) {
-      for (const scene of first.scenes) {
-        step('Chapitre 1 — panels : ' + scene.title);
+      const scenes = first.scenes || [];
+      let sceneIdx = 0;
+      for (const scene of scenes) {
+        sceneIdx += 1;
+        phase(6, 'Scène ' + sceneIdx + '/' + scenes.length + ' — ' + scene.title + ' : cadrage des panels');
         try {
           scene.panels = await T.ai.panels(p, scene);
         } catch (e) {
           scene.panels = [];
           softErrors.push('Panels « ' + scene.title + ' » : ' + (e.message || 'échec'));
         }
-        job.total += (scene.panels || []).length;
-        advance();
+        let panelIdx = 0;
         for (const panel of scene.panels || []) {
-          step('Chapitre 1 — bulles : panel ' + panel.orderIndex);
+          panelIdx += 1;
+          phase(6, 'Scène ' + sceneIdx + '/' + scenes.length + ' — bulles ' + panelIdx + '/' + scene.panels.length);
           try {
             panel.dialogues = await T.ai.dialogues(p, panel);
           } catch (e) {
             panel.dialogues = [];
             softErrors.push('Bulles panel ' + panel.orderIndex + ' : ' + (e.message || 'échec'));
           }
-          advance();
         }
         checkpoint();
       }
-      if (first.scenes[0]) T.ui.sceneId = first.scenes[0].id;
+      if (scenes[0]) T.ui.sceneId = scenes[0].id;
     }
 
-    step('Couverture, titres & synopsis');
+    phase(7);
     p.marketing = await T.ai.marketing(p);
-    advance();
+    checkpoint();
 
+    phase(8);
     seedCanon(p);
     checkpoint();
+    finish();
     T.toast('Projet complet généré · ' + chapters + ' chapitre(s), ' + T.stats(p).panels + ' panels', 'ok');
     if (softErrors.length) T.toast(softErrors.length + ' étape(s) partielle(s) : utilisez « Réessayer » dans les modules concernés', 'error');
     navigate('couverture');
   }
 
+  function applyBriefPreset(id) {
+    const preset = (T.briefPresets || []).find((x) => x.id === id);
+    if (!preset) return;
+    T.update((pr) => {
+      pr.idea = preset.idea;
+      if (!pr.title || pr.title === 'Nouveau webtoon') pr.title = preset.title;
+    });
+    render();
+    T.toast('Amorce « ' + preset.label + ' » chargée — modifiez-la librement', 'ok');
+  }
+
   /* ---------------- actions ---------------- */
   const actions = {
     go: (el) => navigate(el.dataset.route),
-    toggleSidebar: () => document.getElementById('sidebar').classList.toggle('is-open'),
-    closeSidebar: () => document.getElementById('sidebar').classList.remove('is-open'),
+    toggleSidebar: () => setSidebar(!document.getElementById('sidebar').classList.contains('is-open')),
+    closeSidebar: () => setSidebar(false),
+    'skip-content': () => {
+      const v = document.getElementById('view');
+      if (!v) return;
+      v.setAttribute('tabindex', '-1');
+      v.focus();
+      v.scrollIntoView({ block: 'start' });
+    },
+    'toggle-job': () => { T.ui.jobFolded = !T.ui.jobFolded; renderJobDock(); },
+    'brief-preset': (el) => {
+      const preset = (T.briefPresets || []).find((x) => x.id === el.dataset.preset);
+      if (!preset) return;
+      const p = T.project();
+      if (!String(p.idea || '').trim()) { applyBriefPreset(preset.id); return; }
+      openModal('<div class="eyebrow">Amorce</div><h2 style="margin-top:0">Remplacer le brief actuel ?</h2>' +
+        '<p class="small">L’amorce « ' + esc(preset.label) + ' » remplacera le texte présent. Le reste du projet n’est pas modifié.</p>' +
+        '<div class="row" style="margin-top:16px"><button type="button" class="btn btn-primary" data-action="apply-brief-preset" data-preset="' + esc(preset.id) + '">Remplacer le brief</button><button type="button" class="btn btn-ghost" data-action="close-modal">Annuler</button></div>');
+    },
+    'apply-brief-preset': (el) => { closeModal(); applyBriefPreset(el.dataset.preset); },
     'close-modal': () => closeModal(),
     'confirm-pending': () => { const fn = pendingConfirm; closeModal(); if (fn) fn(); },
     'clear-error': () => { T.lastError = null; render(); },
@@ -911,7 +1004,17 @@
   });
 
   document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape') closeModal();
+    if (ev.key === 'Escape') { closeModal(); setSidebar(false); }
+    // ⌘/Ctrl + Entrée dans le brief = lancer la génération complète.
+    if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
+      const el = ev.target;
+      if (el && el.dataset && el.dataset.bind === 'idea') {
+        ev.preventDefault();
+        const btn = document.querySelector('[data-action="gen-all"]:not([disabled])');
+        if (btn) btn.click();
+        else T.toast('Brief trop court (40 caractères minimum) ou moteur indisponible.', 'error');
+      }
+    }
     if ((ev.metaKey || ev.ctrlKey) && ev.key === 's') {
       ev.preventDefault();
       T.save();
