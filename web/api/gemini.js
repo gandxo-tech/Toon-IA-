@@ -9,9 +9,8 @@
 const ALLOWED_MODELS = new Set([
   'gemini-3.1-flash-lite-preview',
   'gemini-3.5-flash',
-  'gemini-2.5-flash',
-  'gemini-2.5-pro',
-  'gemini-2.0-flash'
+  'gemini-3.8-flash',
+  'gemini-3.1-pro-preview'
 ]);
 // Le modèle défini dans GEMINI_MODEL (Vercel) est toujours autorisé.
 if (process.env.GEMINI_MODEL) ALLOWED_MODELS.add(process.env.GEMINI_MODEL);

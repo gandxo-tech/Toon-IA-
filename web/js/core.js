@@ -440,9 +440,8 @@
   AI.MODELS = [
     'gemini-3.1-flash-lite-preview',
     'gemini-3.5-flash',
-    'gemini-2.5-flash',
-    'gemini-2.5-pro',
-    'gemini-2.0-flash'
+    'gemini-3.8-flash',
+    'gemini-3.1-pro-preview'
   ];
   AI.server = { checked: false, hasKey: false, model: null };
   AI.hasServerKey = () => !!(AI.server && AI.server.hasKey);
@@ -457,7 +456,8 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const cfg = await res.json();
       AI.server = { checked: true, hasKey: !!cfg.hasServerKey, model: cfg.model || null };
-      if (cfg.model) T.state.settings.model = cfg.model;
+      // Ne remplace le choix de l'utilisateur que s'il n'a encore aucun modèle enregistré.
+      if (cfg.model && !T.state.settings.model) T.state.settings.model = cfg.model;
     } catch (_) {
       AI.server = { checked: true, hasKey: false, model: null };
     }
