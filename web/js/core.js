@@ -442,6 +442,21 @@
     'gemini-3.5-flash',
     'gemini-3.8-flash'
   ];
+
+  /**
+   * Un modèle enregistré peut avoir été retiré de la liste (quota, dépréciation).
+   * On le remplace alors par le modèle serveur s'il est valide, sinon par le défaut.
+   */
+  AI.normalizeModel = function () {
+    const s = T.state && T.state.settings;
+    if (!s) return null;
+    if (AI.MODELS.indexOf(s.model) !== -1) return s.model;
+    const serverModel = AI.server && AI.server.model;
+    s.model = AI.MODELS.indexOf(serverModel) !== -1 ? serverModel : AI.MODELS[0];
+    T.saveQuiet();
+    return s.model;
+  };
+
   AI.server = { checked: false, hasKey: false, model: null };
   AI.hasServerKey = () => !!(AI.server && AI.server.hasKey);
 

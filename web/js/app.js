@@ -1038,6 +1038,7 @@
   /* ---------------- démarrage ---------------- */
   function boot() {
     T.load();
+    T.ai.normalizeModel();
     T.ui = { sceneId: null, canonTab: 'overview', contradictions: [] };
     if (!location.hash) location.hash = '#/accueil';
     render();
