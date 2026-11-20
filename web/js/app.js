@@ -623,7 +623,7 @@
     if (!preset) return;
     T.update((pr) => {
       pr.idea = preset.idea;
-      if (!pr.title || pr.title === 'Nouveau webtoon') pr.title = preset.title;
+      if (!pr.title || pr.title === 'Nouveau webtoon' || pr.title === 'Mon webtoon') pr.title = preset.title;
     });
     render();
     T.toast('Amorce « ' + preset.label + ' » chargée — modifiez-la librement', 'ok');

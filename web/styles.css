@@ -433,7 +433,7 @@ p { margin: 0 0 12px; }
 .module-state { margin-top: 10px; }
 
 /* ---------- Pipeline / progression ---------- */
-.pipeline { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 16px; }
+.pipeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 6px; margin-top: 16px; }
 .pipe-step {
   flex: 1;
   min-width: 76px;
