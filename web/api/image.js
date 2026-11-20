@@ -76,6 +76,47 @@ function sleep(ms) {
 }
 
 /**
+ * Pollinations/Flux suit beaucoup mieux un prompt anglais court. On demande
+ * une traduction visuelle au modèle texte (gratuit) ; en cas d'échec on garde
+ * le prompt français d'origine.
+ */
+async function translateForPollinations(apiKey, prompt) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const upstream = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent',
+      {
+        method: 'POST',
+        headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{
+            role: 'user',
+            parts: [{
+              text:
+                'Translate this webtoon cover or panel prompt into concise, visual English for an image model. ' +
+                'Keep the setting, characters, clothing, palette and lighting. Keep the no-text instruction if present. ' +
+                'Output only the English prompt, no quotes, maximum 110 words.\n\n' + prompt
+            }]
+          }],
+          generationConfig: { temperature: 0.2, maxOutputTokens: 500 }
+        })
+      }
+    );
+    if (!upstream.ok) return prompt;
+    const data = await upstream.json().catch(() => null);
+    const parts = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+    const text = (parts || []).map((part) => part.text || '').join(' ').trim();
+    return text || prompt;
+  } catch (_) {
+    return prompt;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * Repli gratuit quand Gemini refuse les images en Free Tier : Pollinations.
  * Le tier anonyme est limité à une image toutes les 45 s ; on attend le
  * Retry-After une fois avant de rendre la main.
@@ -83,7 +124,8 @@ function sleep(ms) {
 async function pollinationsImage(prompt, aspectRatio) {
   const size = pollinationsSize(aspectRatio);
   const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(String(prompt).slice(0, 1500)) +
-    '?width=' + size.width + '&height=' + size.height + '&nologo=true&model=sana&seed=' + Math.floor(Math.random() * 1000000000);
+    '?width=' + size.width + '&height=' + size.height + '&nologo=true&model=flux&seed=' + Math.floor(Math.random() * 1000000000) +
+    '&negative_prompt=' + encodeURIComponent('text, letters, typography, logo, watermark, anime, bright daylight, smiling');
 
   for (let attempt = 0; attempt < 2; attempt++) {
     const controller = new AbortController();
@@ -109,7 +151,7 @@ async function pollinationsImage(prompt, aspectRatio) {
       return {
         image: 'data:' + contentType + ';base64,' + buffer.toString('base64'),
         mimeType: contentType,
-        model: 'sana',
+        model: 'flux',
         provider: 'pollinations'
       };
     }
@@ -275,7 +317,8 @@ module.exports = async function handler(req, res) {
 
     if (freeTierBlocked) {
       try {
-        const fallback = await pollinationsImage(prompt, aspectRatio);
+        const englishPrompt = await translateForPollinations(apiKey, prompt);
+        const fallback = await pollinationsImage(englishPrompt, aspectRatio);
         res.setHeader('X-Image-Provider', 'pollinations');
         return res.status(200).json(fallback);
       } catch (fallbackError) {
@@ -305,4 +348,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports.config = { maxDuration: 60 };
+module.exports.config = { maxDuration: 90 };
