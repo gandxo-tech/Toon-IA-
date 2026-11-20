@@ -1011,3 +1011,8 @@ button.chip:hover { background: rgba(109, 75, 216, 0.3); border-color: var(--vio
   .job-dock .job-steps { max-height: 88px; }
   .toast-wrap { top: 66px; }
 }
+
+@media (max-width: 820px) {
+  body.sidebar-open { overflow: hidden; }
+  body.sidebar-open .job-dock { display: none; }
+}
