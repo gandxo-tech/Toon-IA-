@@ -557,6 +557,42 @@
   }
   T.callGemini = callGemini;
 
+  /**
+   * Génère une illustration via le proxy /api/image (clé TOON_IA côté serveur).
+   * Renvoie une data URL prête à afficher.
+   */
+  AI.image = async function (prompt, aspectRatio) {
+    if (AI.server.checked && !AI.hasServerKey()) throw new Error(NO_KEY_MESSAGE);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 90000);
+    let res;
+    try {
+      res = await fetch('/api/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: ctrl.signal,
+        body: JSON.stringify({ prompt: prompt, aspectRatio: aspectRatio || '3:4' })
+      });
+    } catch (e) {
+      clearTimeout(timer);
+      if (e.name === 'AbortError') throw new Error('Délai dépassé (90 s) : l’image n’a pas été générée.');
+      throw new Error('Réseau indisponible ou requête image bloquée. ' + (e.message || ''));
+    }
+    clearTimeout(timer);
+
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      const message = data && data.error && data.error.message ? data.error.message : 'HTTP ' + res.status;
+      const err = new Error(message);
+      err.status = res.status;
+      throw err;
+    }
+    if (!data || typeof data.image !== 'string' || data.image.indexOf('data:image/') !== 0) {
+      throw new Error('Réponse image invalide du serveur.');
+    }
+    return data.image;
+  };
+
   function canonContext(p) {
     const c = p.canon || {};
     const facts = (c.memories || []).map((m) => '- [' + m.category + '] ' + m.fact).join('\n') || '- (aucune mémoire canonique)';
@@ -891,6 +927,36 @@
       '<rect width="160" height="100" fill="' + ink + '" opacity="0.06"/>' +
       '</svg>';
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  };
+
+  /**
+   * Réduit une illustration avant stockage : le localStorage a une limite d’environ
+   * 5 Mo, et un projet peut contenir une couverture + une quinzaine de panels.
+   */
+  T.compressImage = function (dataUrl, maxSide, quality) {
+    return new Promise((resolve) => {
+      if (!dataUrl || dataUrl.indexOf('data:image/') !== 0) { resolve(dataUrl); return; }
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const max = maxSide || 800;
+          const scale = Math.min(1, max / Math.max(img.width, img.height));
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { resolve(dataUrl); return; }
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality || 0.75));
+        } catch (_) {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
   };
 
   /* ---------------- moteur canonique ---------------- */

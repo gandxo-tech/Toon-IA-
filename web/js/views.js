@@ -177,7 +177,7 @@
         '</div>' +
         '<button type="button" class="btn btn-primary btn-lg" data-action="gen-all"' + (missing || tooShort ? ' disabled' : '') + '>✦ Générer tout le projet</button>' +
       '</div>' +
-      '<p class="tiny" style="margin:10px 0 0">Astuce <span class="mono">⌘ / Ctrl + Entrée</span> lance la génération. Comptez une vingtaine d’appels Gemini selon le nombre de chapitres.</p>' +
+      '<p class="tiny" style="margin:10px 0 0">Astuce <span class="mono">⌘ / Ctrl + Entrée</span> lance la génération. Comptez une trentaine d’appels Gemini (texte + illustrations) selon le nombre de chapitres.</p>' +
       (missing
         ? '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>TOON_IA absente de ce déploiement</h4><p>Ajoutez la variable <span class="mono">TOON_IA</span> dans Vercel (Production) puis redéployez : sans elle, aucune génération n’est possible.</p></div></div>'
         : '') +
@@ -572,7 +572,7 @@
       ((s.panels || []).length === 0
         ? empty('▧', 'Scène non découpée', '« ' + s.title + ' » n’a pas encore de panels. Le prompt visuel est en anglais et interdit explicitement tout texte dans l’image.', genBtn('gen-panels', 'Découper maintenant'))
         : '<div class="panel-grid">' + s.panels.map((pn, i) =>
-            '<article class="panel-card"><div class="panel-art"><img src="' + T.art(pn.artSeed || (s.id + ':' + i), genreId) + '" alt="Visuel procédural du panel ' + esc(pn.orderIndex) + '" loading="lazy" />' +
+            '<article class="panel-card"><div class="panel-art"><img src="' + (pn.image || T.art(pn.artSeed || (s.id + ':' + i), genreId)) + '" alt="' + (pn.image ? 'Illustration IA du panel ' : 'Visuel procédural du panel ') + esc(pn.orderIndex) + '" loading="lazy" />' +
               (pn.dialogues || []).slice(0, 2).map((d) => '<div class="bubble bubble-' + esc(d.type.toLowerCase()) + ' pos-' + (d.placement || 'TOP_LEFT').toLowerCase().replace('_', '-').replace('_', '-') + '">' + esc(T.clamp(d.text, 70)) + '</div>').join('') +
             '</div><div class="panel-body">' +
               '<div class="panel-meta"><span class="badge">#' + esc(pn.orderIndex) + '</span><span class="badge">' + esc(pn.cameraAngle) + '</span><span class="badge">' + esc(pn.dominantEmotion) + '</span>' + (pn.soundEffects ? '<span class="badge badge-ai">' + esc(pn.soundEffects) + '</span>' : '') + '</div>' +
@@ -607,7 +607,7 @@
       errorBlock() + (T.busy === 'dialogues' ? busyBlock('Écriture des dialogues…') : '') +
       Views.scenePicker(p, s.id) +
       '<div class="panel-grid">' + s.panels.map((pn, i) =>
-        '<article class="panel-card"><div class="panel-art"><img src="' + T.art(pn.artSeed || (s.id + ':' + i), genreId) + '" alt="Panel ' + esc(pn.orderIndex) + '" loading="lazy" />' +
+        '<article class="panel-card"><div class="panel-art"><img src="' + (pn.image || T.art(pn.artSeed || (s.id + ':' + i), genreId)) + '" alt="' + (pn.image ? 'Illustration IA du panel ' : 'Panel ') + esc(pn.orderIndex) + '" loading="lazy" />' +
           (pn.dialogues || []).map((d) => '<div class="bubble bubble-' + esc(d.type.toLowerCase()) + ' pos-' + (d.placement || 'TOP_LEFT').toLowerCase().replace(/_/g, '-') + '">' + esc(T.clamp(d.text, 80)) + '</div>').join('') +
         '</div><div class="panel-body">' +
           '<div class="row-between" style="margin-bottom:8px"><span class="badge">Panel #' + esc(pn.orderIndex) + '</span><span class="tiny">' + (pn.dialogues || []).length + ' bulle(s)</span></div>' +
@@ -643,7 +643,7 @@
     return head('Étape 10 — Lettering', 'Lettering & bulles', 'Rendu natif : réplique, pensée, cri, murmure, narration. Modifiez le texte et le placement sans jamais régénérer l’image.', '<button class="btn" data-action="go" data-route="lecture">Lecture verticale →</button>') +
       Views.scenePicker(p, sel.scene.id) +
       '<div class="reader">' + sel.scene.panels.map((pn, i) =>
-        '<div class="reader-panel"><img src="' + T.art(pn.artSeed || (sel.scene.id + ':' + i), genreId) + '" alt="Panel ' + esc(pn.orderIndex) + '" />' +
+        '<div class="reader-panel"><img src="' + (pn.image || T.art(pn.artSeed || (sel.scene.id + ':' + i), genreId)) + '" alt="' + (pn.image ? 'Illustration IA du panel ' : 'Panel ') + esc(pn.orderIndex) + '" />' +
           (pn.dialogues || []).map((d) => '<div class="bubble bubble-' + esc(d.type.toLowerCase()) + ' pos-' + (d.placement || 'TOP_LEFT').toLowerCase().replace(/_/g, '-') + '">' + esc(d.text) + '</div>').join('') +
         '</div>').join('') + '</div>' +
       '<div class="card" style="margin-top:18px"><h3>Réglages de lettering</h3>' +
@@ -666,16 +666,17 @@
     const tagline = (m && m.selectedTagline) || '';
     const genreId = ((p.analysis && p.analysis._genreId) || T.profile(p).id);
     const coverDesc = (m && m.selectedCoverDescription) || (m && m.coverProposal && m.coverProposal.detailedDescriptionNoText) || '';
-    return head('Étape 11 — Packaging', 'Couverture', 'Titres, synopsis, accroche et description visuelle. Règle absolue : l’image ne contient aucun texte, le titre est superposé par l’application.', genBtn('gen-marketing', m ? 'Régénérer' : 'Générer le packaging', !p.idea.trim())) +
-      errorBlock() + (T.busy === 'marketing' ? busyBlock('Génération du packaging éditorial…') : '') +
+    return head('Étape 11 — Packaging', 'Couverture', 'Titres, synopsis, accroche et description visuelle. Règle absolue : l’image ne contient aucun texte, le titre est superposé par l’application.', genBtn('gen-marketing', m ? 'Régénérer' : 'Générer le packaging', !p.idea.trim()) + ' <button class="btn" data-action="gen-images"' + (!m ? ' disabled' : '') + '>Illustrations IA</button>') +
+      errorBlock() + (T.busy === 'marketing' ? busyBlock('Génération du packaging éditorial…') : '') + (T.busy === 'images' ? busyBlock('Génération des illustrations IA…') : '') +
+      (p.illustrationError ? '<div class="alert alert-warn" style="margin-bottom:14px"><span class="alert-ico">⚠</span><div><h4>Illustrations IA indisponibles</h4><p>' + esc(p.illustrationError) + '</p><p class="tiny">Les visuels procéduraux restent affichés. Vérifiez la facturation Gemini liée à TOON_IA, puis relancez « Illustrations IA ».</p></div></div>' : '') +
       (!m
         ? empty('▣', 'Aucun packaging', 'Générez plusieurs propositions de titre, trois longueurs de synopsis et une description de couverture sans texte.')
         : '<div class="cover-stage"><div class="todo-cover">' +
-            '<div class="cover"><img src="' + T.art((p.id || 'cover') + ':cover', genreId) + '" alt="Couverture procédurale" />' +
+            '<div class="cover"><img src="' + (p.coverImage || T.art((p.id || 'cover') + ':cover', genreId)) + '" alt="' + (p.coverImage ? 'Couverture générée par IA' : 'Couverture procédurale') + '" />' +
               '<div class="cover-overlay"><div class="cover-title">' + esc(title) + '</div>' +
               (tagline ? '<div class="cover-tag">' + esc(tagline) + '</div>' : '') +
               '<div class="cover-author">TOONIA STUDIO · GANDXO TECH</div></div></div>' +
-            '<p class="tiny" style="margin-top:8px">Aperçu procédural — le titre est une surcouche HTML, jamais incrusté dans l’image.</p>' +
+            '<p class="tiny" style="margin-top:8px">' + (p.coverImage ? 'Illustration générée par IA' : 'Aperçu procédural') + ' — le titre est une surcouche HTML, jamais incrusté dans l’image.</p>' +
           '</div><div class="stack">' +
             '<div class="card"><h3>Propositions de titre</h3><div class="chips">' + (m.titleProposals || []).map((t) =>
               '<button class="chip ' + (t === m.selectedTitle ? 'chip-neutral' : '') + '" data-action="select-title" data-value="' + esc(t) + '">' + esc(t) + '</button>').join('') + '</div>' +
@@ -779,10 +780,10 @@
       chapters.map((ch) =>
         '<div style="text-align:center;margin:26px 0 14px"><div class="eyebrow" style="justify-content:center">Chapitre ' + esc(ch.number) + '</div><h2 style="margin:0">' + esc(ch.title) + '</h2></div>' +
         '<div class="reader">' + ch.scenes.flatMap((s) => s.panels || []).map((pn, i) =>
-          '<div class="reader-panel"><img src="' + T.art(pn.artSeed || (ch.id + ':' + i), genreId) + '" alt="Panel ' + esc(pn.orderIndex) + '" loading="lazy" />' +
+          '<div class="reader-panel"><img src="' + (pn.image || T.art(pn.artSeed || (ch.id + ':' + i), genreId)) + '" alt="' + (pn.image ? 'Illustration IA du panel ' : 'Panel ') + esc(pn.orderIndex) + '" loading="lazy" />' +
             (pn.dialogues || []).map((d) => '<div class="bubble bubble-' + esc(d.type.toLowerCase()) + ' pos-' + (d.placement || 'TOP_LEFT').toLowerCase().replace(/_/g, '-') + '">' + esc(d.text) + '</div>').join('') +
           '</div>').join('') + '</div>').join('') +
-      '<p class="tiny" style="text-align:center;margin-top:18px">Visuels procéduraux (SVG) — remplacez-les par vos illustrations générées.</p>';
+      '<p class="tiny" style="text-align:center;margin-top:18px">' + (chapters.some((ch) => (ch.scenes || []).some((s) => (s.panels || []).some((pn) => pn.image))) ? 'Illustrations générées par IA — le lettering est une surcouche HTML.' : 'Visuels procéduraux (SVG) — lancez « Illustrations IA » depuis la couverture pour générer les images.') + '</p>';
   };
 
   /* =========================================================
@@ -843,8 +844,8 @@
           '<dt>Modèle</dt><dd>' + esc(s.model) + '</dd>' +
           '<dt>Proxy</dt><dd class="mono">POST /api/gemini</dd>' +
           '<dt>Clé dans le navigateur</dt><dd>aucune</dd></dl>' +
-          '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>Quotas</h4><p>Chaque génération consomme du quota Gemini. La génération complète enchaîne une vingtaine d’appels : lancez-la sur un brief déjà réfléchi.</p></div></div>' +
-          '<div class="alert alert-info" style="margin-top:10px"><span class="alert-ico">◈</span><div><h4>Visuels</h4><p>Les panels et la couverture restent des compositions SVG procédurales : aucun modèle d’image n’est appelé. Les prompts visuels sont fournis prêts à l’emploi.</p></div></div>' +
+          '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>Quotas</h4><p>Chaque génération consomme du quota Gemini. La génération complète enchaîne une trentaine d’appels (texte + images) : lancez-la sur un brief déjà réfléchi.</p></div></div>' +
+          '<div class="alert alert-info" style="margin-top:10px"><span class="alert-ico">◈</span><div><h4>Visuels</h4><p>La couverture et les panels peuvent être générés par Gemini via <span class="mono">/api/image</span>. La génération d’images nécessite un projet Gemini avec facturation active ; sinon les compositions SVG procédurales restent affichées.</p></div></div>' +
           '<div class="divider"></div><p class="small" style="margin:0">Projets enregistrés : <b>' + T.state.projects.length + '</b></p>' +
         '</div></div>';
   };

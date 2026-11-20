@@ -502,6 +502,70 @@
     }
   }
 
+  /* ---------------- illustrations IA ---------------- */
+  function allPanels(p) {
+    return (p.chapters || []).flatMap((ch) => (ch.scenes || []).flatMap((s) => s.panels || []));
+  }
+
+  /**
+   * Génère la couverture puis les panels via /api/image. Une erreur de moteur
+   * (quota, facturation) arrête la série et laisse les visuels procéduraux en place.
+   */
+  async function generateIllustrations(p, onProgress) {
+    const errors = [];
+    p.illustrationError = null;
+    if (!p.marketing) {
+      p.illustrationError = 'Générez d’abord le packaging de couverture, puis relancez les illustrations.';
+      T.save();
+      return [p.illustrationError];
+    }
+
+    const v = p.visual || {};
+    const style = [
+      v.artStyle ? 'Style : ' + v.artStyle : '',
+      v.colorPalette ? 'Palette : ' + v.colorPalette : '',
+      v.lightingMood ? 'Lumière : ' + v.lightingMood : ''
+    ].filter(Boolean).join(' · ');
+    const coverDesc = p.marketing.selectedCoverDescription || ((p.marketing.coverProposal || {}).detailedDescriptionNoText) || '';
+    const panels = allPanels(p);
+
+    if (onProgress) onProgress('Couverture — illustration IA');
+    try {
+      if (!coverDesc) throw new Error('Description de couverture absente.');
+      const prompt = 'Illustration de couverture de webtoon, sans texte, sans lettres, sans logo, sans bulle. ' +
+        coverDesc + ' ' + style + ' Composition verticale, cinématographique.';
+      const raw = await T.ai.image(prompt, '2:3');
+      p.coverImage = await T.compressImage(raw, 1000, 0.8);
+      T.save();
+    } catch (e) {
+      errors.push('Couverture : ' + (e.message || 'échec'));
+      p.illustrationError = errors[0];
+      T.save();
+      // Inutile de lancer 16 panels si le moteur image est bloqué (quota, offre).
+      return errors;
+    }
+
+    for (let i = 0; i < panels.length; i++) {
+      const pn = panels[i];
+      if (onProgress) onProgress('Panel ' + (i + 1) + '/' + panels.length);
+      try {
+        const prompt = 'Illustration de panel de webtoon, sans texte, sans lettres, sans bulle, sans logo. ' +
+          (pn.visualPrompt || pn.actionDescription || '') + ' ' + style + ' Composition verticale, cinématographique.';
+        const raw = await T.ai.image(prompt, '3:4');
+        pn.image = await T.compressImage(raw, 720, 0.72);
+        T.save();
+      } catch (e) {
+        errors.push('Panel ' + (pn.orderIndex || i + 1) + ' : ' + (e.message || 'échec'));
+        p.illustrationError = errors[0];
+        T.save();
+        if (e.status === 401 || e.status === 403 || e.status === 429) break;
+      }
+    }
+    if (!errors.length) p.illustrationError = null;
+    T.save();
+    return errors;
+  }
+
   async function generateProject() {
     const p = T.project();
     if (!p) throw new Error('Aucun projet actif.');
@@ -523,6 +587,7 @@
       ['Chapitres', chapters + ' script' + (chapters > 1 ? 's' : '') + ' à écrire'],
       ['Panels & bulles', 'Découpage du chapitre 1'],
       ['Couverture', 'Titres, synopsis et visuel'],
+      ['Illustrations', 'Couverture & panels'],
       ['Canon', 'Mémorisation des faits validés']
     ];
     const job = (T.job = {
@@ -618,6 +683,11 @@
     checkpoint();
 
     phase(8);
+    const imageErrors = await generateIllustrations(p, (detail) => phase(8, detail));
+    imageErrors.forEach((msg) => softErrors.push('Illustrations — ' + msg));
+    checkpoint();
+
+    phase(9);
     seedCanon(p);
     checkpoint();
     finish();
@@ -802,6 +872,42 @@
     'gen-marketing': () => run('marketing', async () => {
       const p = T.project();
       p.marketing = await T.ai.marketing(p);
+    }),
+
+    'gen-images': () => run('images', async () => {
+      const p = T.project();
+      if (!p.marketing) throw new Error('Générez d’abord la couverture et le synopsis.');
+      const panels = allPanels(p);
+      const job = (T.job = {
+        startedAt: Date.now(),
+        label: 'Illustrations IA',
+        detail: 'Couverture',
+        steps: [{ label: 'Couverture', state: 'active' }, { label: 'Panels', state: 'pending' }],
+        done: 0,
+        total: 2
+      });
+      const renderJob = () => {
+        renderJobDock();
+        const host = document.getElementById('job-inline-host');
+        if (host) host.innerHTML = Views.jobPanel(T.job);
+      };
+      renderJob();
+      const errors = await generateIllustrations(p, (detail) => {
+        if (detail.indexOf('Panel ') === 0) {
+          job.steps[0].state = 'done';
+          job.steps[1].state = 'active';
+          job.done = 1;
+        }
+        job.detail = detail;
+        renderJob();
+      });
+      if (errors.length && !p.coverImage && !panels.some((pn) => pn.image)) throw new Error(errors[0]);
+      job.steps.forEach((s) => { s.state = 'done'; });
+      job.done = 2;
+      job.endedAt = Date.now();
+      renderJob();
+      if (errors.length) T.toast(errors.length + ' illustration(s) en échec — ' + errors[0], 'error');
+      else T.toast('Illustrations IA générées (' + (panels.length + 1) + ')', 'ok');
     }),
     'select-title': (el) => { T.update((p) => { p.marketing.selectedTitle = el.dataset.value; }); render({ keepScroll: true }); },
     'select-synopsis': (el) => { T.update((p) => { p.marketing.selectedSynopsis = el.dataset.value; }); render({ keepScroll: true }); },
