@@ -157,7 +157,8 @@
         T.job.error = T.lastError;
         T.job.endedAt = Date.now();
       }
-      T.toast('Échec de la génération', 'error');
+      // Le panneau d'échec (accueil + dock) porte déjà le message : pas de toast en double.
+      if (!T.job) T.toast('Échec de la génération', 'error');
     } finally {
       stopJobTicker();
       T.busy = null;

@@ -996,3 +996,18 @@ button.chip:hover { background: rgba(109, 75, 216, 0.3); border-color: var(--vio
 @media (max-width: 820px) {
   .toast-wrap { top: 62px; bottom: auto; }
 }
+
+/* ---------- Mobile : barre supérieure et dock compact ---------- */
+@media (max-width: 560px) {
+  .topbar { gap: 8px; padding: 10px 12px; }
+  .topbar > div:nth-child(2) { min-width: 0; flex: 1; }
+  .topbar-title { font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-sub { display: none; }
+  .project-select { padding: 5px 8px; min-width: 0; }
+  .project-select .tiny { display: none; }
+  .project-select select { max-width: 108px; }
+  #engine-badge { display: none; }
+  .job-dock { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .job-dock .job-steps { max-height: 88px; }
+  .toast-wrap { top: 66px; }
+}
