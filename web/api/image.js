@@ -7,10 +7,13 @@
  */
 
 const IMAGE_MODELS = [
+  'gemini-3.1-flash-lite-image',
   'gemini-3.1-flash-image',
-  'gemini-nano-banana-2.1',
+  'gemini-2.5-flash-image',
+  'gemini-3.1-flash-image-preview',
   'gemini-3-pro-image',
-  'gemini-2.5-flash-image'
+  'gemini-3-pro-image-preview',
+  'gemini-nano-banana-2.1'
 ];
 const MAX_PROMPT_CHARS = 8000;
 const WINDOW_MS = 60 * 1000;
@@ -152,13 +155,15 @@ module.exports = async function handler(req, res) {
   const aspectRatio = typeof body.aspectRatio === 'string' && /^\d{1,2}:\d{1,2}$/.test(body.aspectRatio)
     ? body.aspectRatio
     : '3:4';
+  const forcedModel = typeof body.model === 'string' && IMAGE_MODELS.includes(body.model) ? body.model : null;
+  const models = forcedModel ? [forcedModel] : IMAGE_MODELS;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
   let last = { status: 502, message: 'Aucun modèle image n’a répondu.' };
 
   try {
-    for (const model of IMAGE_MODELS) {
+    for (const model of models) {
       if (controller.signal.aborted) break;
       const { upstream, data } = await requestImage(apiKey, model, prompt, aspectRatio, controller.signal);
 
@@ -177,13 +182,14 @@ module.exports = async function handler(req, res) {
 
       const message =
         (data && data.error && data.error.message) || 'Erreur Gemini (HTTP ' + upstream.status + ').';
-      last = { status: upstream.status, message };
-      // Quota global ou accès refusé : inutile d'essayer les autres modèles.
-      if (upstream.status === 429 || upstream.status === 401 || upstream.status === 403) break;
-      // 400 / 404 : le modèle n'est pas disponible pour cette clé, on tente le suivant.
+      last = { status: upstream.status, message, model };
+      // Accès refusé : inutile d'essayer les autres modèles.
+      if (upstream.status === 401 || upstream.status === 403) break;
+      // 400 / 404 / 429 : le modèle n'est pas disponible ou quota à zéro pour
+      // cette clé, mais un autre modèle image peut répondre.
     }
 
-    return res.status(last.status || 502).json({ error: { message: last.message } });
+    return res.status(last.status || 502).json({ error: { message: last.message, model: last.model || null } });
   } catch (error) {
     const aborted = error && error.name === 'AbortError';
     return res.status(aborted ? 504 : 502).json({
