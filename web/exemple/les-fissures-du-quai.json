@@ -1,0 +1,1313 @@
+{
+  "id": "proj_nducbtja",
+  "title": "Les Fissures du quai",
+  "idea": "Thriller psychologique dans une ville portuaire française de 1990. Sujet : une inspectrice en disgrâce, revenue après dix ans d’exil, enquête sur trois disparitions que sa hiérarchie veut enterrer. Elle reconnaît sur une photo un homme qu’elle croyait mort. Ton : pluie, néons, culpabilité, dialogues secs. Personnages : l’inspectrice obstinée, un journaliste idéaliste, un docker au passé trouble. Ambiance : polar âpre, cliffhangers en fin de chapitre. Fin : la vérité coûte sa carrière à l’héroïne.",
+  "advanced": {},
+  "analysis": {
+    "genrePrincipal": "Thriller",
+    "sousGenres": [
+      "Polar",
+      "Thriller psychologique",
+      "Néo-noir"
+    ],
+    "ton": "Âpre, mélancolique et tendu",
+    "themesDetectes": [
+      "Culpabilité",
+      "Corruption institutionnelle",
+      "Passé refoulé",
+      "Exil"
+    ],
+    "elementsNarratifsExplicites": [
+      "Ville portuaire française des années 1990",
+      "Inspectrice en disgrâce de retour après dix ans",
+      "Enquête sur trois disparitions étouffées par la hiérarchie",
+      "Apparition d'un homme présumé mort",
+      "Trio de personnages : inspectrice, journaliste idéaliste, docker au passé trouble",
+      "Fin tragique pour la carrière de l'héroïne"
+    ],
+    "ambiguitesAClarifier": [
+      "Quel est le lien exact entre l'inspectrice et l'homme qu'elle croyait mort ?",
+      "Quelle est la nature précise des disparitions (criminelles, politiques, surnaturelles) ?",
+      "Quel rôle joue spécifiquement le docker dans l'intrigue principale ?",
+      "La hiérarchie cherche-t-elle à enterrer l'affaire par simple négligence ou par implication directe dans les disparitions ?"
+    ],
+    "_genreId": "mystere"
+  },
+  "characters": [
+    {
+      "name": "Élise Vallet",
+      "role": "Protagoniste / Inspectrice",
+      "archetype": "Le détective en disgrâce",
+      "personality": "Obsédée, introvertie, cynique mais dotée d'un sens moral inébranlable.",
+      "physicalAppearance": "Cheveux courts châtain cendré, yeux gris acier fatigués, silhouette nerveuse.",
+      "distinctiveFeatures": "Une cicatrice fine sur la tempe gauche, héritage de l'incident de 1980.",
+      "characteristicClothing": "Trench-coat beige élimé, chemisiers blancs sous des vestes sombres informes.",
+      "abilities": "Maîtrise de l'interrogatoire psychologique, analyse fine des dossiers papier, lecture des langages corporels.",
+      "relationships": "Entretient une relation tendue avec sa hiérarchie, une alliance pragmatique avec Marc Morel et une méfiance réciproque avec Joseph Kerdal.",
+      "plannedArc": "Passer de la culpabilité paralysante du passé à une quête de vérité totale, acceptant de sacrifier sa carrière pour exposer la corruption.",
+      "currentState": "Vient de revenir après dix ans d'exil, affectée à des tâches subalternes au commissariat, cherchant désespérément à prouver l'existence des disparitions.",
+      "id": "char_dgobn47c",
+      "isValidated": false
+    },
+    {
+      "name": "Marc Morel",
+      "role": "Journaliste local",
+      "archetype": "L'idéaliste obstiné",
+      "personality": "Enthousiaste, un peu naïf mais courageux, guidé par une soif de vérité brute.",
+      "physicalAppearance": "Cheveux bruns en bataille, yeux marron clair, visage marqué par des cernes permanents.",
+      "distinctiveFeatures": "Doigts constamment tachés d'encre noire, un bloc-notes toujours à portée de main.",
+      "characteristicClothing": "Pull en laine grossière, veste en velours côtelé marron un peu trop grande.",
+      "abilities": "Capacité à obtenir des informations par le bouche-à-oreille, excellente connaissance des rouages politiques locaux.",
+      "relationships": "Allié de confiance d'Élise Vallet, il sert de pont entre elle et le monde civil en dehors de la police.",
+      "plannedArc": "Découvrir la corruption institutionnelle et perdre son innocence journalistique au profit d'un professionnalisme plus amer.",
+      "currentState": "Enquête sur les disparitions pour la gazette locale malgré les menaces de ses supérieurs de ne pas couvrir l'affaire.",
+      "id": "char_z74j3si7",
+      "isValidated": false
+    },
+    {
+      "name": "Joseph 'Le Muet' Kerdal",
+      "role": "Docker",
+      "archetype": "Le témoin silencieux",
+      "personality": "Taciturne, méfiant, colérique, protégeant farouchement ses secrets.",
+      "physicalAppearance": "Crâne rasé, yeux bleu délavé, carrure massive et épaules voutées par le travail manuel.",
+      "distinctiveFeatures": "Mains calleuses et noueuses, une dent en or qui brille quand il grogne.",
+      "characteristicClothing": "Veste de travail bleue en toile robuste, pantalon de treillis usé, bottes de sécurité boueuses.",
+      "abilities": "Connaissance intime du port et de ses recoins secrets, force physique brute.",
+      "relationships": "Protège les autres dockers tout en craignant les réseaux de contrebande, suspect numéro un d'Élise Vallet.",
+      "plannedArc": "Passer du silence protecteur à la confrontation avec son propre passé pour empêcher de nouvelles disparitions.",
+      "currentState": "Travaille au Quai 14, observant les mouvements suspects dans les hangars tout en essayant d'échapper à la surveillance policière.",
+      "id": "char_s0q5au73",
+      "isValidated": false
+    }
+  ],
+  "world": {
+    "rules": "Le déterminisme social est absolu : le passé de chaque individu est une condamnation inéluctable. La corruption est institutionnalisée, rendant toute quête de justice solitaire et vouée à l'échec structurel. Les victoires sont toujours partielles et se soldent invariablement par une perte personnelle majeure.",
+    "factions": "La Préfecture (Police locale corrompue), le Syndicat des Dockers (qui gère la loi du silence sur les quais), et la Presse Locale (divisée entre la compromission par survie et l'idéalisme suicidaire).",
+    "geography": "Une ville portuaire française anonyme, décrépite, caractérisée par une humidité permanente, des zones industrielles en déclin, des ruelles étroites et un port tentaculaire qui constitue le véritable centre nerveux de la ville.",
+    "socialStructure": "Une hiérarchie rigide et fermée. En haut, une élite politique et policière protectrice de ses intérêts. Au milieu, une classe ouvrière désabusée vivant sous la menace du chômage. En bas, les parias et les disparus que personne ne cherche.",
+    "historyLore": "L'incident de 1980 au Quai 14 reste la plaie béante de la ville. Une bavure couverte par la hiérarchie a mené à la mort suspecte d'un informateur et à la destruction de la carrière d'Élise Vallet, instaurant un pacte tacite de silence qui régit la ville depuis dix ans.",
+    "terminology": "• La Zone : Secteur portuaire interdit. • Le Silence : Code de conduite des dockers. • La Grise : La pluie incessante de la région. • Dossier Poussière : Enquête enterrée par la hiérarchie. • Le Fantôme : Surnom donné à l'homme qu'Élise a cru mort en 1980.",
+    "worldConstraints": "Le récit est strictement limité à l'an 1990. Interdiction d'utiliser des technologies modernes : tout passe par le téléphone filaire, les archives papier, les photographies argentiques et le travail de terrain physique. La météo est invariablement pluvieuse et sombre.",
+    "locations": [
+      {
+        "name": "Le Bar des Embruns",
+        "description": "Un débit de boisson sombre situé à la lisière des zones portuaires où les dockers et les informateurs se croisent.",
+        "atmosphere": "Fumée épaisse, odeur de tabac froid et lumière vacillante des néons publicitaires extérieurs.",
+        "id": "loc_8jir0xwd",
+        "orderIndex": 0,
+        "isValidated": false
+      },
+      {
+        "name": "Le commissariat de district",
+        "description": "Un bâtiment administratif froid, datant des années 70, aux couloirs interminables et aux bureaux saturés de dossiers jaunis.",
+        "atmosphere": "Stérile, bureaucratique et hostile au changement.",
+        "id": "loc_t6fbhhnu",
+        "orderIndex": 1,
+        "isValidated": false
+      },
+      {
+        "name": "Les hangars du Quai 14",
+        "description": "Structure métallique immense et rouillée, abandonnée officiellement mais cœur battant de la contrebande nocturne.",
+        "atmosphere": "Glauque, sonore à cause du vent qui s'engouffre dans les tôles, chargé de mystère.",
+        "id": "loc_97u5mgkw",
+        "orderIndex": 2,
+        "isValidated": false
+      }
+    ],
+    "objects": [
+      {
+        "name": "La photographie argentique",
+        "significance": "C'est l'élément déclencheur qui confronte Élise à son passé.",
+        "description": "Un cliché noir et blanc, légèrement corné, montrant un homme de dos sur le port, dont la silhouette est identique à celle de l'informateur disparu en 1980.",
+        "id": "obj_oy1npwtr",
+        "ownerCharacterId": null,
+        "isValidated": false
+      },
+      {
+        "name": "Le carnet de notes de Marc Morel",
+        "significance": "Symbole de la quête de vérité brute et de la vulnérabilité du journaliste.",
+        "description": "Un carnet à spirale usé, rempli de noms de dockers, d'horaires de marées et de transcriptions d'appels anonymes, souvent maculé de taches de pluie et d'encre qui bave.",
+        "id": "obj_7qrsxong",
+        "ownerCharacterId": null,
+        "isValidated": false
+      }
+    ],
+    "isValidated": false
+  },
+  "story": {
+    "premise": "Dix ans après avoir été évincée de la police suite à une opération ratée, l'inspectrice Élise Vallet revient dans sa ville portuaire natale. Lorsqu'elle découvre que trois disparitions récentes sont ignorées par sa hiérarchie corrompue et qu'elle aperçoit sur une photo un homme qu'elle croyait mort en 1980, elle s'enfonce dans une enquête dangereuse qui menace de faire éclater les secrets du port.",
+    "confirmedGenre": "Thriller psychologique",
+    "mainThemes": "Culpabilité, corruption institutionnelle, passé refoulé, exil, déterminisme social.",
+    "generalTone": "Âpre, mélancolique, tendu, pluvieux, marqué par une atmosphère de néons et de tabac froid.",
+    "mainConflicts": "Conflit interne : la culpabilité d'Élise face à son échec passé. Conflit relationnel : la méfiance réciproque entre Élise, le journaliste Marc Morel et le docker Joseph Kerdal. Conflit sociétal : la lutte solitaire d'Élise contre une hiérarchie policière et syndicale corrompue qui verrouille la vérité.",
+    "mainPlot": "Acte 1 : Élise revient et prend ses fonctions ; elle ignore les ordres de sa hiérarchie et s'intéresse aux disparitions des dockers. Acte 2 : En faisant équipe avec Marc Morel, elle découvre le lien entre les disparitions et le trafic au Quai 14, identifiant l'homme supposé mort. Acte 3 : Élise affronte les responsables du port et la hiérarchie corrompue, découvrant que le silence était protégé depuis dix ans ; elle expose la vérité au prix de sa carrière.",
+    "subPlots": "La quête de légitimité journalistique de Marc Morel qui frôle l'obsession ; le lourd secret que protège Joseph Kerdal concernant sa propre survie ; la relation glaciale d'Élise avec ses anciens collègues qui la considèrent comme une traîtresse.",
+    "narrativeDirection": "Polar noir linéaire progressant vers une résolution brutale et une désillusion institutionnelle, ponctué par des cliffhangers en fin de chapitre.",
+    "pacing": "Lente et pesante au début, reflétant l'ambiance pluvieuse et mélancolique, s'accélérant brutalement vers un climax nerveux et désespéré.",
+    "timelineEvents": [
+      {
+        "title": "L'incident du quai 14",
+        "description": "Une opération policière infiltrée vire au massacre ; l'informateur d'Élise est porté disparu et déclaré mort, causant l'éviction de l'inspectrice.",
+        "dateOrEpoch": "1980",
+        "id": "evt_f523auoj",
+        "orderIndex": 1,
+        "isValidated": false
+      },
+      {
+        "title": "L'exil forcé",
+        "description": "Sous la pression de sa hiérarchie et incapable de supporter le poids de son échec, Élise quitte la ville portuaire pour une décennie d'anonymat.",
+        "dateOrEpoch": "1981",
+        "id": "evt_y05k91z5",
+        "orderIndex": 2,
+        "isValidated": false
+      },
+      {
+        "title": "La première disparition",
+        "description": "Un docker disparaît sans laisser de trace ; la police locale étouffe immédiatement l'affaire, déclenchant une série de non-dits.",
+        "dateOrEpoch": "Mai 1990",
+        "id": "evt_ndk4ya81",
+        "orderIndex": 3,
+        "isValidated": false
+      }
+    ],
+    "isValidated": false
+  },
+  "visual": {
+    "artStyle": "Réalisme sombre avec des lignes de contour appuyées et un encrage dense pour accentuer le relief des visages marqués par la fatigue.",
+    "colorPalette": "Dominante monochrome de gris, bleu nuit et noir, rehaussée par des touches de néons violents (jaune acide, rouge sang) et le ton sépia des archives papier.",
+    "panelingStyle": "Défilement vertical exploitant la verticalité du port, avec des gouttières étroites et sombres pour renforcer le sentiment d'enfermement et de paranoïa.",
+    "lightingMood": "Chiaroscuro marqué, jeux d'ombres portées dans les hangars et reflets irisés sur les pavés mouillés par la pluie constante.",
+    "recurringVisualElements": "La pluie battante traversant les cases, les volutes de fumée de cigarette, et les dossiers jaunis qui servent de ponctuation visuelle.",
+    "framingRules": "Utilisation fréquente de gros plans sur les regards et les mains nerveuses, alternant avec des plans larges écrasants pour illustrer l'impuissance face à l'institution.",
+    "continuityElements": "Le manteau délavé d'Élise, le carnet de notes de Marc, et les textures métalliques rouillées des quais qui évoluent au fil de l'enquête.",
+    "isValidated": false
+  },
+  "humor": {
+    "humorStyle": "Humour noir, pince-sans-rire et cynique, utilisé uniquement comme mécanisme de défense pour supporter la dureté du quotidien.",
+    "chibiMomentsAllowed": false,
+    "runningGags": "Les tentatives désespérées d'Élise pour obtenir un café potable au commissariat et les pannes récurrentes de la voiture de Marc.",
+    "punchlineFrequency": "Très rare, réservée aux échanges brefs et acerbes entre Élise et Marc pour briser la tension dramatique.",
+    "characterHumorHooks": "Le cynisme tranchant d'Élise face à la bureaucratie absurde et la maladresse enthousiaste de Marc face au danger.",
+    "comicSituations": "Le décalage entre les procédures administratives rigides et la réalité sordide des enquêtes de terrain dans les zones portuaires.",
+    "isValidated": false
+  },
+  "chapters": [
+    {
+      "id": "chap_1zylizox",
+      "number": 1,
+      "title": "Les Fissures du quai",
+      "synopsis": "En 1990, Élise Vallet revient dans sa ville portuaire natale dix ans après une opération ratée qui a détruit sa carrière. Alors qu'elle tente de reprendre sa place au commissariat, la disparition d'un docker et la découverte d'une photographie compromettante la plongent de nouveau dans les secrets inavouables du Quai 14.",
+      "isCanon": false,
+      "scenes": [
+        {
+          "id": "scene_bdzev1db",
+          "orderIndex": 1,
+          "title": "Le retour de l'ombre",
+          "locationName": "Le commissariat de district",
+          "charactersPresent": [
+            "Élise Vallet"
+          ],
+          "summary": "Élise Vallet franchit le seuil du commissariat pour son premier jour de réintégration forcée, confrontée à l'hostilité silencieuse de ses anciens collègues.",
+          "beats": [
+            "Élise observe les couloirs gris et l'odeur de papier jauni qui n'a pas changé.",
+            "Elle se présente à l'accueil sous les regards méprisants des agents.",
+            "Elle découvre son nouveau bureau, exigu et encombré de dossiers classés sans suite.",
+            "Elle ressent le poids de son échec passé qui imprègne chaque mur."
+          ],
+          "atmosphere": "Stérile, bureaucratique et hostile.",
+          "emotionalArc": "De l'appréhension à une détermination froide.",
+          "pacingNotes": "Lente, centrée sur les sensations visuelles et auditives du lieu.",
+          "detail": null,
+          "panels": [
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Entrée du commissariat",
+              "actionDescription": "Élise se tient devant les lourdes portes battantes, hésitant une seconde avant d'entrer. La pluie ruisselle sur son trench-coat.",
+              "dominantEmotion": "Appréhension",
+              "cameraAngle": "Plongée légèrement inclinée",
+              "composition": "Plan moyen, Élise centrée, écrasée par l'architecture austère.",
+              "lightingAndAtmosphere": "Éclairage froid, bleuté par la pluie, contraste avec la lumière jaunâtre intérieure.",
+              "backgroundDetails": "Façade bétonnée année 70, enseigne de commissariat vieillissante.",
+              "visualEffects": "Gouttes de pluie et reflets sur le sol humide.",
+              "visualPrompt": "A woman in a 1990 trench coat standing in front of a brutalist concrete police station building, heavy rain, dark gloomy atmosphere, street photography style, cinematic lighting.",
+              "continuityNotes": "Élise a les cheveux châtain cendré courts, silhouette nerveuse.",
+              "soundEffects": "Pschhh... (pluie)",
+              "id": "panel_xgtltgeh",
+              "orderIndex": 1,
+              "artSeed": "scene_bdzev1db:0",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "NARRATION",
+                  "emotion": "neutre",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans. Le béton a vieilli, mais l'odeur de désinfection et de mensonges est restée la même.",
+                  "id": "dlg_0toulgef"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "appréhension",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Il n'est pas trop tard pour faire demi-tour. Pourquoi je suis revenue ici ?",
+                  "id": "dlg_r8p5o7tk"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, agents de police en arrière-plan",
+              "location": "Hall principal du commissariat",
+              "actionDescription": "Elle avance dans le couloir. Les agents s'arrêtent de travailler pour la dévisager avec mépris.",
+              "dominantEmotion": "Cynisme",
+              "cameraAngle": "Vue à hauteur d'épaule",
+              "composition": "Plan large, Élise en mouvement, les collègues forment une barrière visuelle.",
+              "lightingAndAtmosphere": "Lumière crue des néons vacillants, atmosphère pesante.",
+              "backgroundDetails": "Couloirs aux murs jaunis, affiches administratives défraîchies.",
+              "visualEffects": "Effet de flou sur les visages des collègues pour accentuer l'isolement.",
+              "visualPrompt": "Interior of a 1990 police station hallway, worn out walls, flickering fluorescent lights, a woman walking alone while police officers stare at her with hostility, gritty atmosphere, 35mm film grain.",
+              "continuityNotes": "Les agents ne sont pas identifiés mais leur hostilité est évidente.",
+              "id": "panel_d9wkshoa",
+              "orderIndex": 2,
+              "artSeed": "scene_bdzev1db:1",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Cynique",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans plus tard, l'odeur de café froid et de lâcheté est toujours la même.",
+                  "id": "dlg_qza23bzs"
+                },
+                {
+                  "speakerName": "NARRATION",
+                  "type": "NARRATION",
+                  "emotion": "Neutre",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Le silence se propage dans le hall à mesure qu'elle avance. Les regards, eux, sont chargés de reproches.",
+                  "id": "dlg_pe9km2f1"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Bureau exigu",
+              "actionDescription": "Élise pose son sac sur un bureau encombré de piles de dossiers poussiéreux.",
+              "dominantEmotion": "Fatigue",
+              "cameraAngle": "Plan rapproché",
+              "composition": "Élise au premier plan, dossiers en désordre occupant l'espace.",
+              "lightingAndAtmosphere": "Lumière rasante venant d'une fenêtre étroite, poussière en suspension.",
+              "backgroundDetails": "Bureau métallique années 80, cendrier plein, dossiers jaunis.",
+              "visualEffects": "Focus sur la poussière dans le rayon de lumière.",
+              "visualPrompt": "Close up of a tired woman in a 1990 office, stacks of old paper files, messy metal desk, dust particles in the air, somber and claustrophobic, film noir aesthetic.",
+              "continuityNotes": "Elle porte une tenue sobre, air fatigué.",
+              "id": "panel_z6ei7u8z",
+              "orderIndex": 3,
+              "artSeed": "scene_bdzev1db:2",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Fatigue",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans. Rien n'a changé. Cette odeur de poussière et de vieux papier me donne envie de vomir.",
+                  "id": "dlg_tobf7ne5"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "SPEECH",
+                  "emotion": "Cynisme",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Toujours les mêmes dossiers qui pourrissent, toujours la même administration morte.",
+                  "id": "dlg_3qresj2m"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Bureau exigu",
+              "actionDescription": "Elle effleure un dossier posé sur le dessus, ses yeux gris acier se fixant sur une date ou un nom qui ravive ses souvenirs.",
+              "dominantEmotion": "Mélancolie",
+              "cameraAngle": "Très gros plan",
+              "composition": "Focus sur les doigts d'Élise et le dossier.",
+              "lightingAndAtmosphere": "Sombre, éclairage focalisé sur le dossier.",
+              "backgroundDetails": "Bords du bureau flous.",
+              "visualEffects": "Vignettage sombre accentuant l'oppression.",
+              "visualPrompt": "Extreme close up of a woman's fingers touching an old, yellowed police file, focus on the paper texture, moody lighting, intense psychological thriller atmosphere, 1990s aesthetic.",
+              "continuityNotes": "L'expression de ses yeux est capitale pour le récit.",
+              "id": "panel_gz8e73ni",
+              "orderIndex": 4,
+              "artSeed": "scene_bdzev1db:3",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Mélancolie",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans. Le papier a jauni, mais l'encre reste aussi corrosive que ce jour-là.",
+                  "id": "dlg_416rxl0o"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "WHISPER",
+                  "emotion": "Mélancolie",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Tu n'aurais jamais dû réapparaître sur cette photo, Antoine.",
+                  "id": "dlg_8zo89qe3"
+                }
+              ]
+            }
+          ],
+          "isValidated": false
+        },
+        {
+          "id": "scene_7ivwrr3l",
+          "orderIndex": 2,
+          "title": "La photo de la discorde",
+          "locationName": "Le commissariat de district",
+          "charactersPresent": [
+            "Élise Vallet"
+          ],
+          "summary": "En triant les dossiers sur les récentes disparitions, Élise tombe sur une pièce à conviction qui fait basculer sa certitude sur le passé.",
+          "beats": [
+            "Élise feuillette un dossier sur la disparition d'un docker en mai 1990.",
+            "Elle découvre une photographie de surveillance prise au loin dans les hangars.",
+            "Elle identifie, au second plan, un visage qu'elle croyait mort depuis 1980.",
+            "Le choc de la reconnaissance lui coupe le souffle."
+          ],
+          "atmosphere": "Tension contenue, lumière blafarde des néons.",
+          "emotionalArc": "De la routine au choc traumatique.",
+          "pacingNotes": "Accélération soudaine lors de la découverte visuelle.",
+          "detail": null,
+          "panels": [
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Le commissariat de district",
+              "actionDescription": "Élise est assise à son bureau encombré de dossiers jaunis, ses yeux gris acier scrutant une pile de documents sous la lumière crue d'une lampe de bureau.",
+              "dominantEmotion": "Concentration lasse",
+              "cameraAngle": "Plongée en plan moyen",
+              "composition": "Élise au centre, entourée par l'amoncellement chaotique de paperasse administrative.",
+              "lightingAndAtmosphere": "Lumière jaune maladive, atmosphère étouffante et bureaucratique.",
+              "backgroundDetails": "Murs décrépis, dossiers empilés, calendrier mural de 1990.",
+              "visualEffects": "Poussière en suspension dans le faisceau lumineux.",
+              "visualPrompt": "A weary female detective with short ash-brown hair sitting at a cluttered desk in a 1990s police station. High angle, cinematic film grain, dim yellow desk lamp lighting, piles of yellowed paper files, grimy office walls, moody and realistic.",
+              "continuityNotes": "Élise porte sa tenue de travail habituelle, silhouette nerveuse.",
+              "soundEffects": "Rrrriiip",
+              "id": "panel_lo7enaw3",
+              "orderIndex": 1,
+              "artSeed": "scene_7ivwrr3l:0",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "lasse",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans d'exil pour revenir fouiller les mêmes poubelles. Rien n'a changé ici, pas même l'odeur de la poussière.",
+                  "id": "dlg_c8p2fian"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "NARRATION",
+                  "emotion": "neutre",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "La pluie bat contre les vitres du commissariat, un rythme monotone qui souligne le silence complice des couloirs.",
+                  "id": "dlg_tt0x3tus"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "suspicieuse",
+                  "placement": "TOP_RIGHT",
+                  "text": "Trois disparus en un mois et aucune trace dans le registre. Ils croient vraiment que je ne vois pas les trous dans leurs dossiers ?",
+                  "id": "dlg_th3gt9wb"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Le commissariat de district",
+              "actionDescription": "Elle extrait une photographie de surveillance granuleuse d'une pochette plastique, ses doigts effleurant le papier glacé.",
+              "dominantEmotion": "Curiosité",
+              "cameraAngle": "Gros plan sur les mains et la photo",
+              "composition": "La photo occupe le premier plan, le visage d'Élise est flou en arrière-plan.",
+              "lightingAndAtmosphere": "Éclairage focalisé sur la photographie.",
+              "backgroundDetails": "Bureau en bois rayé.",
+              "visualEffects": "Grain de film accentué sur la photographie.",
+              "visualPrompt": "Close up of trembling hands holding a blurry black and white grainy surveillance photograph from 1990. The photograph shows a dark, wet industrial port scene. Dim office lighting, focus on the texture of the old photograph.",
+              "continuityNotes": "La photo montre un hangar au loin.",
+              "soundEffects": "Schhh",
+              "id": "panel_ld1moy8i",
+              "orderIndex": 2,
+              "artSeed": "scene_7ivwrr3l:1",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Curiosité",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans plus tard, le même regard froid. Comment est-ce possible ?",
+                  "id": "dlg_fxileawt"
+                },
+                {
+                  "speakerName": "NARRATION",
+                  "type": "NARRATION",
+                  "emotion": "Neutre",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "La pluie martelait la vitre du commissariat. Sur le cliché, l'homme qu'elle pensait mort semblait la fixer à travers le grain du papier.",
+                  "id": "dlg_hgjxklxv"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Le commissariat de district",
+              "actionDescription": "Élise plisse les yeux, son regard se fige sur un détail à l'arrière-plan de la photo : une silhouette masculine reconnaissable.",
+              "dominantEmotion": "Stupéfaction glaciale",
+              "cameraAngle": "Gros plan sur le visage d'Élise",
+              "composition": "Le visage d'Élise occupe tout le cadre, soulignant la dilatation de ses pupilles.",
+              "lightingAndAtmosphere": "Ombres marquées sur le visage, atmosphère tendue.",
+              "backgroundDetails": "Flou artistique du bureau.",
+              "visualEffects": "Léger effet de flou sur les bords du cadre pour simuler le choc émotionnel.",
+              "visualPrompt": "Extreme close up of a woman's face, grey eyes wide in shock and disbelief, ash-brown hair messy. Cinematic lighting, dramatic shadows, noir style, 1990s aesthetic, intense emotional expression.",
+              "continuityNotes": "Elle reconnaît l'homme mort en 1980.",
+              "soundEffects": "Silence lourd",
+              "id": "panel_zxxiom1u",
+              "orderIndex": 3,
+              "artSeed": "scene_7ivwrr3l:2",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Stupéfaction",
+                  "placement": "TOP_LEFT",
+                  "text": "Ce n'est pas possible. Ce manteau, cette posture... c'est lui.",
+                  "id": "dlg_ngdhus42"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "WHISPER",
+                  "emotion": "Choc",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Tu es mort, Julien. Tu es censé être mort depuis dix ans.",
+                  "id": "dlg_6plh3juf"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Le commissariat de district",
+              "actionDescription": "La photographie glisse de ses doigts, Élise reste pétrifiée, le souffle court, fixant le vide.",
+              "dominantEmotion": "Culpabilité et terreur",
+              "cameraAngle": "Contre-plongée légère",
+              "composition": "Élise est décentrée, le bureau semble l'écraser.",
+              "lightingAndAtmosphere": "Lumière froide et bleutée venant de la fenêtre, contraste avec la lampe de bureau.",
+              "backgroundDetails": "Bureau en désordre, ombre portée sur le mur.",
+              "visualEffects": "Vignettage sombre.",
+              "visualPrompt": "Wide shot of a female detective frozen in a dark office, desk lamp knocked over, moody blue ambient light from a rainy window, shadow of the building outside cast on the wall, 1990s noir thriller atmosphere.",
+              "continuityNotes": "La photo est tombée au sol.",
+              "soundEffects": "Tap",
+              "id": "panel_m5oxoe1t",
+              "orderIndex": 4,
+              "artSeed": "scene_7ivwrr3l:3",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Terreur",
+                  "placement": "TOP_LEFT",
+                  "text": "Ce n'est pas possible... il est mort depuis dix ans.",
+                  "id": "dlg_hwz5rusz"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "WHISPER",
+                  "emotion": "Culpabilité",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Ton visage... tu es revenu pour finir le travail, n'est-ce pas ?",
+                  "id": "dlg_k7on4rl1"
+                }
+              ]
+            }
+          ],
+          "isValidated": false
+        },
+        {
+          "id": "scene_rrt27xqf",
+          "orderIndex": 3,
+          "title": "Confidences sous la pluie",
+          "locationName": "Le Bar des Embruns",
+          "charactersPresent": [
+            "Élise Vallet",
+            "Marc Morel"
+          ],
+          "summary": "Élise rencontre Marc Morel dans un bar sordide pour recueillir ses informations sur les disparitions que la police refuse d'enquêter.",
+          "beats": [
+            "Élise retrouve Marc, trempée par la pluie battante de 1990.",
+            "Marc partage ses doutes sur la version officielle de la police.",
+            "Élise lui montre discrètement la photo, cherchant une confirmation extérieure.",
+            "Marc insiste sur la corruption qui gangrène les hautes sphères."
+          ],
+          "atmosphere": "Vaporeuse, tabac froid, bruit du port au loin.",
+          "emotionalArc": "Méfiance mutuelle évoluant vers une alliance fragile.",
+          "pacingNotes": "Rythme saccadé, dialogues courts et nerveux.",
+          "detail": null,
+          "panels": [
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Entrée du Bar des Embruns",
+              "actionDescription": "Élise pousse la porte en bois vermoulu du bar, trempée par une pluie battante, son imperméable brillant sous l'eau.",
+              "dominantEmotion": "Détermination",
+              "cameraAngle": "Contre-plongée légère",
+              "composition": "Élise au centre, porte ouverte laissant entrer le vent et la pluie.",
+              "lightingAndAtmosphere": "Contraste fort entre le bleu nuit de la pluie dehors et le jaune sale des néons intérieurs.",
+              "backgroundDetails": "Enseigne néon vacillante avec le nom du bar en partie éteint.",
+              "visualEffects": "Gouttes de pluie percutant le sol, flou cinétique sur l'eau.",
+              "visualPrompt": "A woman with short ash-brown hair and a trench coat entering a dark, gritty 1990s French coastal bar at night, intense rain outside, neon sign flickering, cinematic lighting, realistic style, 1990s aesthetic.",
+              "continuityNotes": "Élise porte son imperméable sombre, ses cheveux sont plaqués par la pluie.",
+              "soundEffects": "SHHHH-CLAC",
+              "id": "panel_3bzssw6k",
+              "orderIndex": 1,
+              "artSeed": "scene_rrt27xqf:0",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Cynique",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans. Rien n'a changé. L'odeur de tabac froid et de mensonges est toujours aussi épaisse.",
+                  "id": "dlg_jn4u5pol"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "NARRATION",
+                  "emotion": "Neutre",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "La porte gémit sur ses gonds, accueillant une bourrasque de pluie dans l'antre des oubliés.",
+                  "id": "dlg_jh4p9wzw"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, Marc Morel",
+              "location": "Bar des Embruns, table isolée",
+              "actionDescription": "Élise s'assoit en face de Marc. Ce dernier, les yeux cernés, semble nerveux, une cigarette se consumant dans un cendrier plein.",
+              "dominantEmotion": "Tension",
+              "cameraAngle": "Plan moyen",
+              "composition": "Vue de profil, le visage de Marc est éclairé par une lumière rasante.",
+              "lightingAndAtmosphere": "Fumée épaisse, lumière tamisée, ambiance lourde et moite.",
+              "backgroundDetails": "Dockers flous en arrière-plan, vieux calendrier mural de 1990.",
+              "visualEffects": "Nuages de fumée de cigarette persistants.",
+              "visualPrompt": "Two people sitting at a small, dirty table in a 1990s dimly lit dive bar, a man with messy brown hair and dark circles under his eyes talking to a serious woman, cigarette smoke, ash-filled tray, moody atmosphere, cinematic close-up.",
+              "continuityNotes": "Marc porte une veste en velours côtelé usée.",
+              "soundEffects": "Murmures étouffés",
+              "id": "panel_9dvb5dzv",
+              "orderIndex": 2,
+              "artSeed": "scene_rrt27xqf:1",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "SPEECH",
+                  "emotion": "Cynique",
+                  "placement": "TOP_LEFT",
+                  "text": "Écrase ça, Marc. L'odeur de ce tabac me donne envie de vomir. Tes sources sont sûres ?",
+                  "id": "dlg_bd8c51kh"
+                },
+                {
+                  "speakerName": "Marc Morel",
+                  "type": "WHISPER",
+                  "emotion": "Nerveux",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Tu ne réalises pas. Ce qu'ils cachent sous les dossiers du Quai 14, ça dépasse tout ce qu'on a connu ici.",
+                  "id": "dlg_33ydydj6"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Troublée",
+                  "placement": "BOTTOM_LEFT",
+                  "text": "Le Quai 14. Encore. Dix ans après, le passé remonte toujours à la surface.",
+                  "id": "dlg_2pqti8fa"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, Marc Morel",
+              "location": "Bar des Embruns",
+              "actionDescription": "Élise glisse une photographie jaunie sur la table. Marc se penche dessus, son regard s'assombrit.",
+              "dominantEmotion": "Inquiétude",
+              "cameraAngle": "Gros plan (zoom sur la photo)",
+              "composition": "La main d'Élise maintient le bord de la photo, focus sur le visage de l'homme sur la photo.",
+              "lightingAndAtmosphere": "Éclairage direct par une lampe de table faiblarde.",
+              "backgroundDetails": "Surface de table en formica rayé.",
+              "visualEffects": "Vignettage accentuant le focus sur la photo.",
+              "visualPrompt": "A close-up shot of a hand sliding a worn, yellowed vintage photograph on a scratched table, focus on the man's face in the photo, 1990s grainy paper texture, dramatic shadows, moody lighting.",
+              "continuityNotes": "La photo montre un homme vu de profil, visage partiellement caché par une ombre.",
+              "soundEffects": "FROISSEMENT",
+              "id": "panel_6ne02g1g",
+              "orderIndex": 3,
+              "artSeed": "scene_rrt27xqf:2",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "SPEECH",
+                  "emotion": "froide",
+                  "placement": "TOP_LEFT",
+                  "text": "Regarde bien cette photo, Marc. C'était il y a dix ans, juste avant que tout ne bascule.",
+                  "id": "dlg_gpr163hu"
+                },
+                {
+                  "speakerName": "Marc Morel",
+                  "type": "SPEECH",
+                  "emotion": "inquiet",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "C'est impossible... Il est mort sur le quai 14, Élise. Tout le monde le sait.",
+                  "id": "dlg_84k171ld"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "WHISPER",
+                  "emotion": "amère",
+                  "placement": "BOTTOM_LEFT",
+                  "text": "C'est ce qu'ils ont écrit dans les rapports. Mais regarde ses yeux.",
+                  "id": "dlg_w40zw965"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, Marc Morel",
+              "location": "Bar des Embruns",
+              "actionDescription": "Marc chuchote quelque chose, ses mains tremblent légèrement, pointant du doigt vers la sortie du bar.",
+              "dominantEmotion": "Peur",
+              "cameraAngle": "Plan rapproché, focus sur le visage de Marc",
+              "composition": "Marc en avant-plan, Élise partiellement hors champ.",
+              "lightingAndAtmosphere": "Lumière bleue des néons extérieurs filtrant à travers la vitre sale.",
+              "backgroundDetails": "Vitre embuée avec des reflets de la rue déserte.",
+              "visualEffects": "Profondeur de champ courte.",
+              "visualPrompt": "Close-up of a nervous man with brown messy hair, 1990s style, whispering with fear in his eyes, dimly lit bar interior, reflections on a dirty window in the background, cinematic, grainy.",
+              "continuityNotes": "Élise est en train d'écouter intensément, sourcils froncés.",
+              "soundEffects": "CHUT",
+              "id": "panel_it2bsbgw",
+              "orderIndex": 4,
+              "artSeed": "scene_rrt27xqf:3",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Marc Morel",
+                  "type": "WHISPER",
+                  "emotion": "Peur",
+                  "placement": "BOTTOM_LEFT",
+                  "text": "Ne te retourne pas, Élise. Il est là-bas, près de la porte.",
+                  "id": "dlg_gzyqd3t3"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Choc",
+                  "placement": "TOP_RIGHT",
+                  "text": "Ce visage... C'est impossible. Il est censé être mort depuis dix ans.",
+                  "id": "dlg_1djn477i"
+                },
+                {
+                  "speakerName": "Marc Morel",
+                  "type": "WHISPER",
+                  "emotion": "Anxiété",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Il nous surveille depuis que nous sommes entrés. On doit sortir d'ici.",
+                  "id": "dlg_r5aab4lb"
+                }
+              ]
+            }
+          ],
+          "isValidated": false
+        },
+        {
+          "id": "scene_19mb5god",
+          "orderIndex": 4,
+          "title": "Le secret du docker",
+          "locationName": "Les hangars du Quai 14",
+          "charactersPresent": [
+            "Élise Vallet",
+            "Joseph 'Le Muet' Kerdal"
+          ],
+          "summary": "Élise se rend sur les lieux de contrebande pour confronter Kerdal, espérant obtenir des réponses sur l'homme de la photo.",
+          "beats": [
+            "Élise s'introduit dans le hangar bruissant sous le vent.",
+            "Elle surprend Kerdal en pleine transaction nocturne.",
+            "Kerdal réagit avec agressivité, menaçant de la faire taire.",
+            "Élise utilise son badge et son autorité pour le forcer à parler, le laissant ébranlé par une révélation surprenante."
+          ],
+          "atmosphere": "Glauque, sonore, angoissante.",
+          "emotionalArc": "Du danger immédiat à la révélation inquiétante.",
+          "pacingNotes": "Rapide et intense, se terminant sur un cliffhanger visuel.",
+          "detail": null,
+          "panels": [
+            {
+              "charactersPresent": "Élise Vallet",
+              "location": "Entrée des hangars du Quai 14",
+              "actionDescription": "Élise s'introduit dans le hangar en écartant une porte métallique coulissante rouillée. La pluie fine tombe sur ses épaules.",
+              "dominantEmotion": "Déterminée",
+              "cameraAngle": "Plongée grand angle",
+              "composition": "Élise est placée en bas à gauche, sa silhouette sombre contrastant avec l'immensité du hangar désaffecté.",
+              "lightingAndAtmosphere": "Lumière bleutée de la nuit pluvieuse, atmosphère glauque et venteuse.",
+              "backgroundDetails": "Structure métallique immense, tôles ondulées, vent sifflant, ombres projetées.",
+              "visualEffects": "Brume légère, éclaboussures de pluie au sol.",
+              "visualPrompt": "A gritty, cinematic webtoon panel showing a lone female detective entering a massive, decaying, rusted metal warehouse at night in 1990. Rain falling, silhouette of a woman in a trench coat, moody blue moonlight and shadows, industrial decay, 1990s noir aesthetic.",
+              "continuityNotes": "Élise porte son imperméable gris, ses cheveux châtain cendré sont mouillés.",
+              "soundEffects": "CREEEEEE-AK",
+              "id": "panel_8gguduep",
+              "orderIndex": 1,
+              "artSeed": "scene_19mb5god:0",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "NARRATION",
+                  "emotion": "Déterminée",
+                  "placement": "TOP_LEFT",
+                  "text": "Le métal hurle sous mes doigts. Dix ans d'absence pour revenir à ce point précis.",
+                  "id": "dlg_2rd7p3tj"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Déterminée",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Cette fois, rien ne m'empêchera de savoir ce qui s'est réellement passé ici.",
+                  "id": "dlg_tnh0m1wx"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, Joseph 'Le Muet' Kerdal",
+              "location": "Intérieur du hangar du Quai 14",
+              "actionDescription": "Élise observe depuis l'ombre Kerdal en pleine transaction nocturne avec un inconnu dans le fond du hangar.",
+              "dominantEmotion": "Suspicion",
+              "cameraAngle": "Vue à hauteur d'épaule depuis l'obscurité",
+              "composition": "La silhouette massive de Kerdal est au centre, éclairée par une seule lampe suspendue vacillante.",
+              "lightingAndAtmosphere": "Clair-obscur, contraste fort entre les zones d'ombre et la lumière crue de la lampe.",
+              "backgroundDetails": "Caisses en bois, vieux filets de pêche, câbles électriques pendant au plafond.",
+              "visualEffects": "Poussière en suspension, scintillement de la lampe.",
+              "visualPrompt": "A dark, atmospheric scene inside an abandoned 1990s warehouse. A massive, burly dock worker with a shaved head is seen talking to a shadowy figure in the background. In the foreground, the edge of a trench coat is visible. High contrast lighting, hazy, dusty, noir thriller style.",
+              "continuityNotes": "Kerdal porte son bleu de travail usé.",
+              "soundEffects": "...",
+              "id": "panel_eruskc6l",
+              "orderIndex": 2,
+              "artSeed": "scene_19mb5god:1",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "THOUGHT",
+                  "emotion": "Suspicion",
+                  "placement": "TOP_LEFT",
+                  "text": "Dix ans plus tard, les mêmes silhouettes, les mêmes ombres. Ce n'est pas possible.",
+                  "id": "dlg_ztwiqt39"
+                },
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "WHISPER",
+                  "emotion": "Tension",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Joseph... qu'est-ce que tu caches encore dans ce trou à rats ?",
+                  "id": "dlg_v4rdg4eg"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, Joseph 'Le Muet' Kerdal",
+              "location": "Intérieur du hangar du Quai 14",
+              "actionDescription": "Élise surgit des ombres, badge à la main. Kerdal se retourne violemment, une barre de fer à la main, le visage tordu de colère.",
+              "dominantEmotion": "Agression",
+              "cameraAngle": "Contre-plongée dynamique",
+              "composition": "La composition est serrée, mettant en valeur le face-à-face tendu entre les deux personnages.",
+              "lightingAndAtmosphere": "Lumière instable, atmosphère électrique et violente.",
+              "backgroundDetails": "Fond flou de structures métalliques, focus sur les visages.",
+              "visualEffects": "Lignes de vitesse pour souligner le mouvement brusque de Kerdal.",
+              "visualPrompt": "Action shot of a confrontation in a dark warehouse. A fierce-looking, muscular dock worker with a shaved head holding a metal bar in anger, facing a female inspector holding up a police badge. Intense gaze, 1990s crime thriller, gritty facial details, dramatic lighting.",
+              "continuityNotes": "Élise a les yeux gris acier fatigués, Kerdal a les yeux bleu délavé injectés de sang.",
+              "soundEffects": "CLANG!",
+              "id": "panel_09xzrm3x",
+              "orderIndex": 3,
+              "artSeed": "scene_19mb5god:2",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "SPEECH",
+                  "emotion": "Sérieuse",
+                  "placement": "TOP_LEFT",
+                  "text": "Posez cette barre, Kerdal. Je sais ce qui se passe ici depuis 80.",
+                  "id": "dlg_bg6aojv5"
+                },
+                {
+                  "speakerName": "Joseph 'Le Muet' Kerdal",
+                  "type": "SHOUT",
+                  "emotion": "Colérique",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "Vous auriez dû rester enterrée avec vos dossiers, Vallet !",
+                  "id": "dlg_s0sdy3kg"
+                },
+                {
+                  "speakerName": "NARRATION",
+                  "type": "NARRATION",
+                  "emotion": "Tendu",
+                  "placement": "CENTER",
+                  "text": "Le vent hurle dans les tôles rouillées du hangar, masquant presque le bruit de la pluie battante sur le toit.",
+                  "id": "dlg_fcvn0092"
+                }
+              ]
+            },
+            {
+              "charactersPresent": "Élise Vallet, Joseph 'Le Muet' Kerdal",
+              "location": "Intérieur du hangar du Quai 14",
+              "actionDescription": "Élise montre une photo à Kerdal. Ce dernier recule, sa carrure massive s'affaissant soudainement, choqué par ce qu'il voit.",
+              "dominantEmotion": "Choc",
+              "cameraAngle": "Plan rapproché sur les visages",
+              "composition": "Élise est au premier plan, Kerdal est légèrement en retrait, son expression changeant radicalement.",
+              "lightingAndAtmosphere": "Lumière blafarde, atmosphère de révélation lourde de conséquences.",
+              "backgroundDetails": "Fond sombre et indistinct pour concentrer l'attention sur l'échange.",
+              "visualEffects": "Grain de film accentué pour le réalisme.",
+              "visualPrompt": "Close-up of a female detective showing a weathered 1990s photograph to a burly, shocked dock worker. The man's face reveals deep surprise and fear. Gritty, cinematic, noir style, dimly lit, 1990s photography style.",
+              "continuityNotes": "La photo montre l'homme que Élise croyait mort.",
+              "soundEffects": "Le vent hurle au dehors.",
+              "id": "panel_xeuaq1hp",
+              "orderIndex": 4,
+              "artSeed": "scene_19mb5god:3",
+              "isValidated": false,
+              "dialogues": [
+                {
+                  "speakerName": "Élise Vallet",
+                  "type": "SPEECH",
+                  "emotion": "froide",
+                  "placement": "TOP_LEFT",
+                  "text": "Regarde bien cette photo, Joseph. Tu le reconnais, n'est-ce pas ?",
+                  "id": "dlg_tgw2k9fm"
+                },
+                {
+                  "speakerName": "Joseph 'Le Muet' Kerdal",
+                  "type": "WHISPER",
+                  "emotion": "peur",
+                  "placement": "BOTTOM_RIGHT",
+                  "text": "C'est impossible... Il est mort. On l'a vu couler.",
+                  "id": "dlg_62wfq0ay"
+                },
+                {
+                  "speakerName": "Narrateur",
+                  "type": "NARRATION",
+                  "emotion": "neutre",
+                  "placement": "CENTER",
+                  "text": "Le vent s'engouffre dans les tôles du hangar, couvrant le bruit d'une vérité qu'ils tentaient tous d'enterrer depuis dix ans.",
+                  "id": "dlg_e2zq648y"
+                }
+              ]
+            }
+          ],
+          "isValidated": false
+        }
+      ]
+    },
+    {
+      "id": "chap_erk7b8xe",
+      "number": 2,
+      "title": "Les Fissures du quai - Chapitre 2 : L'écho des archives",
+      "synopsis": "Élise Vallet s'immisce dans les archives du commissariat malgré l'hostilité de sa hiérarchie. Elle y découvre un cliché troublant d'un homme censé être mort dix ans plus tôt. Elle décide de confronter Joseph Kerdal au Bar des Embruns, poussant Marc Morel à sortir de sa réserve pour l'aider.",
+      "isCanon": false,
+      "scenes": [
+        {
+          "id": "scene_l7dkea3u",
+          "orderIndex": 1,
+          "title": "Le poids du passé",
+          "locationName": "Le commissariat de district",
+          "charactersPresent": [
+            "Élise Vallet"
+          ],
+          "summary": "Élise fouille clandestinement dans les dossiers archivés des années 80 pour faire le lien entre les disparitions récentes et l'incident de 1980.",
+          "beats": [
+            "Élise s'introduit dans la salle des archives étouffante et poussiéreuse.",
+            "Elle manipule des dossiers papier jaunis sous la lumière blafarde d'un néon défaillant.",
+            "Elle trouve une photo d'archive de l'opération de 1980 où apparaît, en arrière-plan, un homme aux traits familiers.",
+            "Elle réalise avec effroi qu'il s'agit du contact qu'elle pensait mort dans l'explosion."
+          ],
+          "atmosphere": "Étouffante, bureaucratique, chargée de culpabilité.",
+          "emotionalArc": "De la concentration froide à la stupeur glaciale.",
+          "pacingNotes": "Lente et méthodique au début, puis soudaine accélération cardiaque.",
+          "detail": null,
+          "panels": [],
+          "isValidated": false
+        },
+        {
+          "id": "scene_qf9svw7a",
+          "orderIndex": 2,
+          "title": "La traque sous la pluie",
+          "locationName": "Le Bar des Embruns",
+          "charactersPresent": [
+            "Élise Vallet",
+            "Joseph 'Le Muet' Kerdal"
+          ],
+          "summary": "Élise interroge Kerdal dans un bar enfumé, cherchant à savoir si l'homme sur la photo est bien vivant.",
+          "beats": [
+            "Élise entre dans le bar, contrastant avec la brutalité habituelle des clients.",
+            "Elle aborde Kerdal, seul dans un coin, buvant un alcool fort.",
+            "Kerdal se montre agressif et refuse de parler, le regard fuyant vers la sortie.",
+            "Élise lui montre la photo ; la réaction physique du docker trahit une peur profonde.",
+            "Kerdal l'avertit de lâcher l'affaire avant de quitter brusquement les lieux."
+          ],
+          "atmosphere": "Sombre, bruyante, imprégnée de tabac froid.",
+          "emotionalArc": "D'une tentative de contrôle à une confrontation nerveuse.",
+          "pacingNotes": "Dialogues secs, silences pesants, tension ascendante.",
+          "detail": null,
+          "panels": [],
+          "isValidated": false
+        },
+        {
+          "id": "scene_xvdqtxot",
+          "orderIndex": 3,
+          "title": "Une alliance fragile",
+          "locationName": "Le Bar des Embruns",
+          "charactersPresent": [
+            "Élise Vallet",
+            "Marc Morel"
+          ],
+          "summary": "Marc Morel observe la scène depuis le bar et décide d'aborder Élise pour proposer son aide.",
+          "beats": [
+            "Marc attend qu'Élise sorte du bar, trempée par la pluie battante.",
+            "Il propose de partager ses propres recherches sur les disparitions récentes.",
+            "Élise est d'abord réticente à coopérer, méfiante envers les journalistes.",
+            "Marc mentionne une information sur le Quai 14 que lui seul possède.",
+            "Élise accepte un rendez-vous, réalisant qu'elle ne peut plus agir seule."
+          ],
+          "atmosphere": "Mélancolique, pluvieuse, sous les néons publicitaires.",
+          "emotionalArc": "Du doute à une méfiance mutuelle, puis une alliance de nécessité.",
+          "pacingNotes": "Rythme tendu par la pluie, fin sur un accord tacite.",
+          "detail": null,
+          "panels": [],
+          "isValidated": false
+        }
+      ]
+    },
+    {
+      "id": "chap_5s7nogaj",
+      "number": 3,
+      "title": "Les Fissures du quai - Chapitre 3 : La mémoire des ombres",
+      "synopsis": "Elise Vallet poursuit son enquête officieuse, confrontant les témoins silencieux du port. Elle se rapproche d'une vérité sur les disparitions actuelles qui résonne avec le traumatisme de 1980.",
+      "isCanon": false,
+      "scenes": [
+        {
+          "id": "scene_c37qws33",
+          "orderIndex": 1,
+          "title": "Rencontre sous la pluie",
+          "locationName": "Le Bar des Embruns",
+          "charactersPresent": [
+            "Élise Vallet",
+            "Marc Morel"
+          ],
+          "summary": "Élise retrouve Marc Morel dans l'atmosphère oppressante du bar pour échanger des informations sur les disparus.",
+          "beats": [
+            "Marc confirme que les trois disparitions sont officiellement classées en fugues volontaires.",
+            "Élise partage son malaise concernant la similitude des méthodes avec l'affaire de 1980.",
+            "Marc avoue qu'il a peur de son propre journalisme, mais décide de continuer à aider Élise.",
+            "Élise met en garde Marc : personne n'est en sécurité."
+          ],
+          "atmosphere": "Brumeux, bruyant, odeur de tabac et de désespoir, néons clignotants.",
+          "emotionalArc": "De la méfiance mutuelle à une alliance fragile basée sur la peur partagée.",
+          "pacingNotes": "Dialogue sec et rapide, entrecoupé par le bruit de la pluie contre les vitres sales.",
+          "detail": null,
+          "panels": [],
+          "isValidated": false
+        },
+        {
+          "id": "scene_bstj5r5z",
+          "orderIndex": 2,
+          "title": "L'interrogatoire impossible",
+          "locationName": "Les hangars du Quai 14",
+          "charactersPresent": [
+            "Élise Vallet",
+            "Joseph 'Le Muet' Kerdal"
+          ],
+          "summary": "Élise traque Joseph Kerdal dans les hangars pour l'interroger sur le docker disparu en mai.",
+          "beats": [
+            "Élise surprend Joseph alors qu'il manipule des caisses suspectes dans l'obscurité.",
+            "Joseph oppose un mutisme farouche, fidèle à son surnom, et menace Élise de partir.",
+            "Élise évoque le passé pour briser sa carapace, citant l'accident de 1980.",
+            "Joseph lâche une information cruciale : il a vu l'homme qu'Élise croyait mort rôder près des quais."
+          ],
+          "atmosphere": "Glauque, échos métalliques, vent sifflant dans la structure rouillée.",
+          "emotionalArc": "De la tension hostile à une révélation choc qui déstabilise totalement l'inspectrice.",
+          "pacingNotes": "Rythme lent et oppressant, accentué par le silence de Joseph et le vent.",
+          "detail": null,
+          "panels": [],
+          "isValidated": false
+        },
+        {
+          "id": "scene_8mtc29mv",
+          "orderIndex": 3,
+          "title": "Le choc du retour",
+          "locationName": "Le commissariat de district",
+          "charactersPresent": [
+            "Élise Vallet"
+          ],
+          "summary": "De retour au commissariat, Élise tente de consulter les dossiers classés secret défense concernant les incidents du quai 14.",
+          "beats": [
+            "Élise infiltre le bureau des archives pour chercher une preuve tangible.",
+            "Elle trouve une photo d'archive de 1980 et la compare avec son intuition du moment.",
+            "La réalisation que sa hiérarchie a falsifié les documents de l'époque la frappe violemment.",
+            "Le chapitre se termine sur Élise comprenant qu'elle est surveillée de l'intérieur par ses propres collègues."
+          ],
+          "atmosphere": "Stérile, froid, lumière des néons blafards sur le papier jauni.",
+          "emotionalArc": "De la détermination froide à une paranoïa justifiée.",
+          "pacingNotes": "Pacing tendu et silencieux, marqué par la crainte d'être découverte à chaque bruit de pas dans le couloir.",
+          "detail": null,
+          "panels": [],
+          "isValidated": false
+        }
+      ]
+    }
+  ],
+  "marketing": {
+    "titleProposals": [
+      "Les Fissures du quai",
+      "La marée des ombres",
+      "Sillages corrompus",
+      "Le poids du ressac"
+    ],
+    "synopsisVariants": [
+      {
+        "lengthType": "Court",
+        "text": "Dix ans après un échec traumatisant, l'inspectrice Élise Vallet revient dans sa ville natale pour enquêter sur des disparitions que sa hiérarchie préfère ignorer. Entre corruption institutionnelle et secrets de port, elle découvre que les spectres du passé ne sont pas toujours morts.",
+        "tagline": "La vérité a un prix que personne ne veut payer."
+      },
+      {
+        "lengthType": "Moyen",
+        "text": "1990. Sous une pluie battante qui ne cesse jamais, Élise Vallet retrouve sa ville portuaire, dix ans après avoir été écartée du service suite à une bavure sanglante sur le quai 14. Lorsqu'une série de disparitions suspectes secoue le district, son instinct d'inspectrice reprend le dessus. Aidée par Marc Morel, un journaliste obstiné, elle plonge dans les bas-fonds de la ville où les dockers comme Joseph Kerdal protègent les secrets d'une corruption bien enracinée. Mais lorsqu'une photo révèle le visage d'un homme qu'elle pensait avoir vu mourir dix ans plus tôt, Élise comprend que son retour n'est pas un hasard, mais le début d'une confrontation inévitable avec sa propre culpabilité.",
+        "tagline": "Le passé est une ancre qui vous tire vers le fond."
+      },
+      {
+        "lengthType": "Long",
+        "text": "Dans le décor poisseux et pluvieux d'une ville portuaire française en 1990, Élise Vallet, inspectrice en disgrâce, revient après une décennie d'exil. Sa hiérarchie, verrouillée dans un système corrompu, veut étouffer trois disparitions de dockers. Refusant de fermer les yeux, Élise s'associe à Marc Morel, un journaliste idéaliste au regard fatigué, pour fouiller les décombres du passé. Leur enquête les conduit des couloirs stériles du commissariat aux hangars rouillés et venteux du quai 14, haut lieu de la contrebande nocturne.\n\nAlors qu'elle tente de percer le mystère, elle reconnaît sur un cliché le visage d'un homme qu'elle croyait mort lors de l'opération désastreuse qui a brisé sa carrière en 1980. Chaque indice rapproche Élise de la vérité, une vérité toxique qui menace de tout détruire. Dans un monde où le déterminisme social écrase les consciences et où la justice n'est qu'une façade, l'inspectrice devra choisir entre sa carrière et sa rédemption, consciente que, dans cette ville, le prix à payer pour l'intégrité est souvent un isolement total et irréversible.",
+        "tagline": "Dix ans de silence. Une vérité pour tout perdre."
+      }
+    ],
+    "coverProposal": {
+      "composition": "Vue en contre-plongée depuis le sol mouillé d'un quai, mettant en valeur une silhouette solitaire se découpant devant un immense hangar métallique rouillé dont les portes sont entrouvertes.",
+      "charactersPresent": [
+        "Élise Vallet vue de dos, portant un trench-coat sombre trempé, sa silhouette nerveuse se détachant contre la lumière blafarde d'un néon lointain."
+      ],
+      "atmosphereAndLighting": "Ambiance lourde et mélancolique. Éclairage contrasté typique du film noir : néons publicitaires vacillants reflétés dans les flaques d'eau, ciel nocturne saturé de pluie, brouillard marin s'infiltrant dans les structures industrielles.",
+      "colorPalette": "Gris acier, bleu nuit, noir profond, avec des éclats de jaune électrique provenant des néons et des tons rouille pour les éléments métalliques du port.",
+      "detailedDescriptionNoText": "Une image cinématographique hyper-réaliste montrant une jetée déserte en 1990. La surface du sol est jonchée de flaques d'eau huileuses reflétant la lumière crue d'un néon publicitaire hors champ. Au second plan, la structure colossale et décrépite d'un hangar du quai 14, dont les tôles ondulées sont marquées par des traînées de rouille orangée. Élise Vallet se tient debout, seule, son trench-coat alourdi par la pluie battante. Aucun texte, aucune typographie ne figure sur l'image."
+    },
+    "selectedTitle": "Les Fissures du quai",
+    "selectedSynopsis": "1990. Sous une pluie battante qui ne cesse jamais, Élise Vallet retrouve sa ville portuaire, dix ans après avoir été écartée du service suite à une bavure sanglante sur le quai 14. Lorsqu'une série de disparitions suspectes secoue le district, son instinct d'inspectrice reprend le dessus. Aidée par Marc Morel, un journaliste obstiné, elle plonge dans les bas-fonds de la ville où les dockers comme Joseph Kerdal protègent les secrets d'une corruption bien enracinée. Mais lorsqu'une photo révèle le visage d'un homme qu'elle pensait avoir vu mourir dix ans plus tôt, Élise comprend que son retour n'est pas un hasard, mais le début d'une confrontation inévitable avec sa propre culpabilité.",
+    "selectedTagline": "La vérité a un prix que personne ne veut payer.",
+    "selectedCoverDescription": "Une image cinématographique hyper-réaliste montrant une jetée déserte en 1990. La surface du sol est jonchée de flaques d'eau huileuses reflétant la lumière crue d'un néon publicitaire hors champ. Au second plan, la structure colossale et décrépite d'un hangar du quai 14, dont les tôles ondulées sont marquées par des traînées de rouille orangée. Élise Vallet se tient debout, seule, son trench-coat alourdi par la pluie battante. Aucun texte, aucune typographie ne figure sur l'image.",
+    "isValidated": false
+  },
+  "canon": {
+    "project": {
+      "finalTitle": "Les Fissures du quai",
+      "finalSynopsis": "1990. Dans une ville portuaire battue par les vents, l'inspectrice Élise Vane revient après une décennie d'exil. Chargée d'enquêter sur trois disparitions étouffées par sa hiérarchie, elle découvre que les secrets du port sont liés à un homme qu'elle pensait mort depuis longtemps. Entre la corruption institutionnelle, la pluie incessante et ses propres démons, Élise doit choisir entre sauver sa carrière ou déterrer une vérité qui pourrait l'anéantir."
+    },
+    "characters": [
+      {
+        "name": "Élise Vallet",
+        "role": "Protagoniste / Inspectrice",
+        "archetype": "L'enquêtrice déchue",
+        "personality": "Obsédée, introvertie, cynique mais dotée d'un sens moral inébranlable.",
+        "physicalAppearance": "Cheveux courts châtain cendré, yeux gris acier fatigués, silhouette nerveuse.",
+        "distinctiveFeatures": "Une cicatrice fine barrant son sourcil gauche, mains tremblantes qu'elle cache dans ses poches.",
+        "characteristicClothing": "Imperméable beige délavé, pull à col roulé sombre, bottines en cuir usées.",
+        "abilities": "Dédicace obsessionnelle aux détails, expertise en balistique, mémoire photographique.",
+        "relationships": "En conflit ouvert avec sa hiérarchie, alliée précaire de Marc Morel.",
+        "plannedArc": "Passer de la culpabilité paralysante à la confrontation ultime, acceptant le sacrifice de sa carrière.",
+        "currentState": "Tout juste revenue après dix ans d'exil, cherchant à se réinsérer malgré l'hostilité ambiante.",
+        "id": "char_6sym13ch",
+        "isValidated": true
+      },
+      {
+        "name": "Marc Morel",
+        "role": "Journaliste local",
+        "archetype": "L'idéaliste obstiné",
+        "personality": "Enthousiaste, un peu naïf mais courageux, guidé par une soif de vérité brute.",
+        "physicalAppearance": "Cheveux bruns en bataille, yeux marron clair, visage marqué par des cernes permanents.",
+        "distinctiveFeatures": "Porte toujours un carnet Moleskine noir à la main, fume nerveusement.",
+        "characteristicClothing": "Veste en velours côtelé marron, chemises mal repassées, écharpe en laine.",
+        "abilities": "Réseau d'informateurs locaux, plume incisive, talent pour obtenir des confidences.",
+        "relationships": "Admire Élise Vallet tout en craignant ses méthodes expéditives.",
+        "plannedArc": "Découvrir la corruption institutionnelle et perdre son innocence journalistique.",
+        "currentState": "Enquête sur les disparitions du port pour un journal local en manque de sujets brûlants.",
+        "id": "char_wf8e11e6",
+        "isValidated": true
+      },
+      {
+        "name": "Joseph 'Le Muet' Kerdal",
+        "role": "Docker",
+        "archetype": "Le témoin au passé trouble",
+        "personality": "Taciturne, méfiant, colérique, protégeant farouchement ses secrets.",
+        "physicalAppearance": "Crâne rasé, yeux bleu délavé, carrure massive et épaules voutées par le travail manuel.",
+        "distinctiveFeatures": "Tatouage d'ancre décolorée sur l'avant-bras droit, mains calleuses et cicatrices de travail.",
+        "characteristicClothing": "Bleu de travail épais, gilet sans manches en cuir, lourdes bottes de sécurité.",
+        "abilities": "Connaissance intime des recoins du port, force physique brute, capacité à disparaître dans la foule.",
+        "relationships": "Entretient des liens ambigus avec les disparus, craint l'inspectrice mais a besoin d'elle.",
+        "plannedArc": "Passer du statut de suspect à celui de collaborateur malgré lui.",
+        "currentState": "Travaille sur les quais de nuit, terrifié par ce qu'il a vu lors de la dernière disparition.",
+        "id": "char_0g796wys",
+        "isValidated": true
+      }
+    ],
+    "locations": [
+      {
+        "name": "Le Bar des Embruns",
+        "description": "Un débit de boisson sombre situé à la lisière des zones portuaires où les dockers et les informateurs se croisent.",
+        "atmosphere": "Fumée épaisse, odeur de tabac froid et lumière vacillante des néons publicitaires extérieurs.",
+        "id": "loc_uj80annd",
+        "orderIndex": 0,
+        "isValidated": false
+      },
+      {
+        "name": "Le commissariat de district",
+        "description": "Un bâtiment administratif froid, datant des années 70, aux couloirs interminables et aux bureaux saturés de dossiers jaunis.",
+        "atmosphere": "Stérile, bureaucratique et hostile au changement.",
+        "id": "loc_4pwz76ys",
+        "orderIndex": 1,
+        "isValidated": false
+      },
+      {
+        "name": "Les hangars du Quai 14",
+        "description": "Structure métallique immense et rouillée, abandonnée officiellement mais cœur battant de la contrebande nocturne.",
+        "atmosphere": "Glauque, sonore à cause du vent qui s'engouffre dans les tôles, chargé de mystère.",
+        "id": "loc_4leglwmw",
+        "orderIndex": 2,
+        "isValidated": false
+      }
+    ],
+    "chapters": [],
+    "memories": [
+      {
+        "id": "mem_z7k06njr",
+        "category": "Personnage",
+        "fact": "Élise Vallet — Protagoniste / Inspectrice. Cheveux courts châtain cendré, yeux gris acier fatigués, silhouette nerveuse.",
+        "impact": "Continuité visuelle et narrative.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_1wo1kymh",
+        "category": "Personnage",
+        "fact": "Marc Morel — Journaliste local. Cheveux bruns en bataille, yeux marron clair, visage marqué par des cernes permanents.",
+        "impact": "Continuité visuelle et narrative.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_w1z9jo8v",
+        "category": "Personnage",
+        "fact": "Joseph 'Le Muet' Kerdal — Docker. Crâne rasé, yeux bleu délavé, carrure massive et épaules voutées par le travail manuel.",
+        "impact": "Continuité visuelle et narrative.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_rj6md05d",
+        "category": "Règle Univers",
+        "fact": "Le monde suit une logique de déterminisme social où le passé finit toujours par rattraper les individus. Les institutions (police, mairie, syndicats) sont intrinsèquement corrompues, privilégiant le silence à la justice. Aucune victoire ne reste totale ; chaq…",
+        "impact": "Loi fondamentale du monde.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_n9eilwqs",
+        "category": "Contrainte Univers",
+        "fact": "Le récit se déroule exclusivement en 1990, sans outils technologiques modernes. L'enquête repose sur des appels téléphoniques, des archives papier et des observations physiques. Le climat est systématiquement pluvieux p…",
+        "impact": "Interdits créatifs.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_1huwn2m0",
+        "category": "Lieu",
+        "fact": "Le Bar des Embruns — Un débit de boisson sombre situé à la lisière des zones portuaires où les dockers et les informateurs se croisent. Atmosphère : Fumée épaisse, odeur de tabac froid et lumière vacillante des néons publicitaires extérieurs.",
+        "impact": "Décor canonique.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_nny0a264",
+        "category": "Lieu",
+        "fact": "Le commissariat de district — Un bâtiment administratif froid, datant des années 70, aux couloirs interminables et aux bureaux saturés de dossiers jaunis. Atmosphère : Stérile, bureaucratique et hostile au changement.",
+        "impact": "Décor canonique.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_aozjuc80",
+        "category": "Lieu",
+        "fact": "Les hangars du Quai 14 — Structure métallique immense et rouillée, abandonnée officiellement mais cœur battant de la contrebande nocturne. Atmosphère : Glauque, sonore à cause du vent qui s'engouffre dans les tôles, chargé de mystère.",
+        "impact": "Décor canonique.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_7fvn95jq",
+        "category": "Thème",
+        "fact": "Culpabilité, Corruption institutionnelle, Passé refoulé, Quête de vérité, Rédemption impossible.",
+        "impact": "Orientation thématique du récit.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_icb1izlj",
+        "category": "Événement clé",
+        "fact": "1980 — L'incident du quai 14 : Une opération policière tourne au désastre, causant la mort présumée de l'informateur de l'héroïne et son éviction disciplinaire.",
+        "impact": "Fait antérieur au chapitre 1.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_v84lhqu0",
+        "category": "Événement clé",
+        "fact": "1981 — Le départ en exil : L'inspectrice quitte la ville portuaire suite à la pression de sa hiérarchie et à son incapacité à faire face à ses échecs.",
+        "impact": "Fait antérieur au chapitre 1.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_1h1w6c5a",
+        "category": "Événement clé",
+        "fact": "Mai 1990 — La disparition de la première victime : Un docker disparaît sans laisser de traces, marquant le début de la série d'événements que la hiérarchie choisit de ignorer.",
+        "impact": "Fait antérieur au chapitre 1.",
+        "createdAt": 1795151912306
+      },
+      {
+        "id": "mem_km2vbfre",
+        "category": "Titre",
+        "fact": "Les Fissures du quai",
+        "impact": "Titre éditorial validé.",
+        "createdAt": 1795151912306
+      }
+    ],
+    "cover": {
+      "title": "Les Fissures du quai",
+      "tagline": "Le passé ne coule jamais.",
+      "visualDescription": "La scène montre un quai industriel en fin de nuit. Le sol est jonché de fissures remplies d'eau sombre, créant des reflets distordus. Au premier plan, une flaque d'eau occupe une large portion, reflétant un vieux néon suspendu qui grésille. À l'arrière-plan, les structures métalliques d'une grue portuaire se perdent dans une brume épaisse, évoquant une architecture carcérale. La silhouette solitaire de l'inspectrice, sombre et indistincte, marche vers le bord du cadre, seule face à l'immensité du port désert."
+    },
+    "storyBible": {
+      "mainThemes": "Culpabilité, Corruption institutionnelle, Passé refoulé, Quête de vérité, Rédemption impossible.",
+      "narrativeDirection": "Polar noir procédural centré sur le déterrement de secrets enfouis avec une structure de cliffhangers systématiques à chaque fin de chapitre.",
+      "generalTone": "Âpre, mélancolique, tendu, pluvieux, empreint d'une atmosphère urbaine poisseuse.",
+      "premise": "Une inspectrice de police en disgrâce retourne dans sa ville portuaire natale après dix ans d'exil pour enquêter sur trois disparitions mystérieuses, tout en découvrant que le spectre de son passé, un homme qu'elle pensait mort, est lié à une conspiration institutionnelle."
+    },
+    "worldBible": {
+      "rules": "Le monde suit une logique de déterminisme social où le passé finit toujours par rattraper les individus. Les institutions (police, mairie, syndicats) sont intrinsèquement corrompues, privilégiant le silence à la justice. Aucune victoire ne reste totale ; chaque révélation entraîne un sacrifice personnel irréversible.",
+      "factions": "Le Syndicat des Dockers (protectionnistes et mutiques), la Direction Départementale de la Police (Bureau des Affaires Internes), la Presse Locale (divisée entre complaisance et idéalistes isolés), et les Ombres du Port (réseau de contrebande informel).",
+      "geography": "Ville portuaire française non nommée, située sur une côte atlantique pluvieuse, marquée par une architecture industrielle vieillissante, des entrepôts désaffectés, des ruelles étroites et un quai central en perpétuelle décrépitude.",
+      "socialStructure": "Une hiérarchie rigide basée sur l'ancienneté et la connivence. Les notables détiennent le pouvoir économique, les forces de l'ordre assurent l'omerta, et la classe ouvrière survit dans une précarité marquée par la désindustrialisation des années 90.",
+      "historyLore": "La ville a connu une vague de disparitions il y a dix ans, étouffées par un scandale financier impliquant la construction d'un terminal maritime. L'inspectrice principale, alors jeune recrue, a été exilée suite à une erreur judiciaire provoquée par sa hiérarchie pour protéger un nom influent.",
+      "terminology": "- Le Grand Vide : expression locale pour désigner la période de disparitions massives. - Quai 14 : zone interdite où se concentrent les activités illégales. - Le Bleu : surnom dépréciatif pour les nouvelles recrues naïves. - L'Encre : surnom donné à la pluie incessante qui noircit les façades.",
+      "worldConstraints": "Le récit se déroule exclusivement en 1990, sans outils technologiques modernes. L'enquête repose sur des appels téléphoniques, des archives papier et des observations physiques. Le climat est systématiquement pluvieux pour renforcer l'oppression visuelle."
+    },
+    "visualBible": null,
+    "humorDNA": null
+  },
+  "validated": {},
+  "createdAt": 1795149268093,
+  "updatedAt": 1795154364341
+}

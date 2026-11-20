@@ -185,6 +185,18 @@
       '</div>';
   }
 
+  /* Projet réellement généré, livré avec le site et chargeable en un clic. */
+  function exampleProjectCard() {
+    return '<div class="card" style="margin-top:18px">' +
+      '<div class="row-between" style="align-items:center;gap:14px;flex-wrap:wrap">' +
+        '<div><div class="eyebrow">Projet généré</div>' +
+          '<h3 style="margin:4px 0 4px">Les Fissures du quai</h3>' +
+          '<p class="small" style="margin:0;max-width:72ch">3 chapitres, 10 scènes, 16 panels et 38 bulles produits de bout en bout par Gemini. Ouvrez-le pour parcourir le studio, le canon et la lecture verticale.</p></div>' +
+        '<button type="button" class="btn btn-primary" data-action="load-example">Ouvrir ce projet →</button>' +
+      '</div>' +
+      '</div>';
+  }
+
   /* =========================================================
      ACCUEIL
      ========================================================= */
@@ -235,6 +247,8 @@
             '</div>' +
           '</div>' +
           briefCard(p, { compact: true, top: true })) +
+
+      exampleProjectCard() +
 
       '<div class="grid grid-4" style="margin-top:18px">' +
         '<div class="metric"><b>' + st.characters + '</b><span>personnages</span></div>' +

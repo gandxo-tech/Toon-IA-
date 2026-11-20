@@ -886,6 +886,30 @@
     'export-all': () => exportAll(),
     print: () => window.print(),
 
+    'load-example': () => {
+      (async () => {
+        try {
+          const res = await fetch('exemple/les-fissures-du-quai.json', { cache: 'no-store' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const data = await res.json();
+          let proj = T.state.projects.find((x) => x.id === data.id);
+          if (!proj) {
+            if (T.state.projects.some((x) => x.title === data.title)) data.title += ' (exemple)';
+            data.id = data.id || T.uid('proj');
+            T.state.projects.push(data);
+            proj = data;
+          }
+          T.state.activeId = proj.id;
+          T.ui = { sceneId: null, canonTab: 'overview', contradictions: [] };
+          T.save();
+          T.toast('Projet généré ouvert : ' + proj.title, 'ok');
+          navigate('couverture');
+        } catch (e) {
+          T.toast('Impossible de charger le projet généré : ' + (e.message || 'erreur réseau'), 'error');
+        }
+      })();
+    },
+
     'test-key': () => {
       (async () => {
         T.toast('Test du moteur en cours…');
