@@ -901,12 +901,13 @@
         job.detail = detail;
         renderJob();
       });
-      if (errors.length && !p.coverImage && !panels.some((pn) => pn.image)) throw new Error(errors[0]);
+      const generated = !!p.coverImage || panels.some((pn) => pn.image);
       job.steps.forEach((s) => { s.state = 'done'; });
       job.done = 2;
       job.endedAt = Date.now();
       renderJob();
-      if (errors.length) T.toast(errors.length + ' illustration(s) en échec — ' + errors[0], 'error');
+      if (!generated) T.toast('Illustrations IA indisponibles — le détail est affiché dans la couverture.', 'error');
+      else if (errors.length) T.toast(errors.length + ' illustration(s) en échec', 'error');
       else T.toast('Illustrations IA générées (' + (panels.length + 1) + ')', 'ok');
     }),
     'select-title': (el) => { T.update((p) => { p.marketing.selectedTitle = el.dataset.value; }); render({ keepScroll: true }); },

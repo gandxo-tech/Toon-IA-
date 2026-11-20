@@ -161,6 +161,7 @@ module.exports = async function handler(req, res) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
   let last = { status: 502, message: 'Aucun modèle image n’a répondu.' };
+  let freeTierBlocked = false;
 
   try {
     for (const model of models) {
@@ -183,12 +184,21 @@ module.exports = async function handler(req, res) {
       const message =
         (data && data.error && data.error.message) || 'Erreur Gemini (HTTP ' + upstream.status + ').';
       last = { status: upstream.status, message, model };
+      if (upstream.status === 429 && /free tier|limit:\s*0/i.test(message)) freeTierBlocked = true;
       // Accès refusé : inutile d'essayer les autres modèles.
       if (upstream.status === 401 || upstream.status === 403) break;
       // 400 / 404 / 429 : le modèle n'est pas disponible ou quota à zéro pour
       // cette clé, mais un autre modèle image peut répondre.
     }
 
+    if (freeTierBlocked) {
+      return res.status(429).json({
+        error: {
+          message:
+            'La génération d’images nécessite un projet Gemini avec facturation active. La clé TOON_IA actuelle est en Free Tier : Google autorise 0 image. Activez la facturation sur le projet lié à la clé, puis relancez « Illustrations IA ».'
+        }
+      });
+    }
     return res.status(last.status || 502).json({ error: { message: last.message, model: last.model || null } });
   } catch (error) {
     const aborted = error && error.name === 'AbortError';
