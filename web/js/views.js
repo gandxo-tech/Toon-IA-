@@ -668,15 +668,15 @@
     const coverDesc = (m && m.selectedCoverDescription) || (m && m.coverProposal && m.coverProposal.detailedDescriptionNoText) || '';
     return head('Étape 11 — Packaging', 'Couverture', 'Titres, synopsis, accroche et description visuelle. Règle absolue : l’image ne contient aucun texte, le titre est superposé par l’application.', genBtn('gen-marketing', m ? 'Régénérer' : 'Générer le packaging', !p.idea.trim()) + ' <button class="btn" data-action="gen-images"' + (!m ? ' disabled' : '') + '>Illustrations IA</button>') +
       errorBlock() + (T.busy === 'marketing' ? busyBlock('Génération du packaging éditorial…') : '') + (T.busy === 'images' ? busyBlock('Génération des illustrations IA…') : '') +
-      (p.illustrationError ? '<div class="alert alert-warn" style="margin-bottom:14px"><span class="alert-ico">⚠</span><div><h4>Illustrations IA indisponibles</h4><p>' + esc(p.illustrationError) + '</p><p class="tiny">Les visuels procéduraux restent affichés. Vérifiez la facturation Gemini liée à TOON_IA, puis relancez « Illustrations IA ».</p></div></div>' : '') +
+      (p.illustrationError ? '<div class="alert alert-warn" style="margin-bottom:14px"><span class="alert-ico">⚠</span><div><h4>Illustrations IA indisponibles</h4><p>' + esc(p.illustrationError) + '</p><p class="tiny">Les visuels procéduraux restent affichés. Vérifiez la facturation Gemini liée à TOON_IA ou réessayez dans une minute, puis relancez « Illustrations IA ».</p></div></div>' : '') +
       (!m
         ? empty('▣', 'Aucun packaging', 'Générez plusieurs propositions de titre, trois longueurs de synopsis et une description de couverture sans texte.')
         : '<div class="cover-stage"><div class="todo-cover">' +
-            '<div class="cover"><img src="' + (p.coverImage || T.art((p.id || 'cover') + ':cover', genreId)) + '" alt="' + (p.coverImage ? 'Couverture générée par IA' : 'Couverture procédurale') + '" />' +
+            '<div class="cover"><img src="' + (p.coverImage || T.art((p.id || 'cover') + ':cover', genreId)) + '" alt="' + (p.coverImage ? (p.coverImageProvider === 'pollinations' ? 'Couverture générée par IA (repli gratuit Pollinations)' : 'Couverture générée par IA') : 'Couverture procédurale') + '" />' +
               '<div class="cover-overlay"><div class="cover-title">' + esc(title) + '</div>' +
               (tagline ? '<div class="cover-tag">' + esc(tagline) + '</div>' : '') +
               '<div class="cover-author">TOONIA STUDIO · GANDXO TECH</div></div></div>' +
-            '<p class="tiny" style="margin-top:8px">' + (p.coverImage ? 'Illustration générée par IA' : 'Aperçu procédural') + ' — le titre est une surcouche HTML, jamais incrusté dans l’image.</p>' +
+            '<p class="tiny" style="margin-top:8px">' + (p.coverImage ? (p.coverImageProvider === 'pollinations' ? 'Illustration générée par IA via le repli gratuit Pollinations (watermark)' : 'Illustration générée par IA (Gemini)') : 'Aperçu procédural') + ' — le titre est une surcouche HTML, jamais incrusté dans l’image.</p>' +
           '</div><div class="stack">' +
             '<div class="card"><h3>Propositions de titre</h3><div class="chips">' + (m.titleProposals || []).map((t) =>
               '<button class="chip ' + (t === m.selectedTitle ? 'chip-neutral' : '') + '" data-action="select-title" data-value="' + esc(t) + '">' + esc(t) + '</button>').join('') + '</div>' +
@@ -783,7 +783,7 @@
           '<div class="reader-panel"><img src="' + (pn.image || T.art(pn.artSeed || (ch.id + ':' + i), genreId)) + '" alt="' + (pn.image ? 'Illustration IA du panel ' : 'Panel ') + esc(pn.orderIndex) + '" loading="lazy" />' +
             (pn.dialogues || []).map((d) => '<div class="bubble bubble-' + esc(d.type.toLowerCase()) + ' pos-' + (d.placement || 'TOP_LEFT').toLowerCase().replace(/_/g, '-') + '">' + esc(d.text) + '</div>').join('') +
           '</div>').join('') + '</div>').join('') +
-      '<p class="tiny" style="text-align:center;margin-top:18px">' + (chapters.some((ch) => (ch.scenes || []).some((s) => (s.panels || []).some((pn) => pn.image))) ? 'Illustrations générées par IA — le lettering est une surcouche HTML.' : 'Visuels procéduraux (SVG) — lancez « Illustrations IA » depuis la couverture pour générer les images.') + '</p>';
+      '<p class="tiny" style="text-align:center;margin-top:18px">' + (chapters.some((ch) => (ch.scenes || []).some((s) => (s.panels || []).some((pn) => pn.image))) ? (p.illustrationProvider === 'pollinations' ? 'Illustrations générées par IA via le repli gratuit Pollinations (1 image/45 s, watermark) — le lettering est une surcouche HTML.' : 'Illustrations générées par IA — le lettering est une surcouche HTML.') : 'Visuels procéduraux (SVG) — lancez « Illustrations IA » depuis la couverture pour générer les images.') + '</p>';
   };
 
   /* =========================================================
@@ -845,7 +845,7 @@
           '<dt>Proxy</dt><dd class="mono">POST /api/gemini</dd>' +
           '<dt>Clé dans le navigateur</dt><dd>aucune</dd></dl>' +
           '<div class="alert alert-warn" style="margin-top:12px"><span class="alert-ico">⚡</span><div><h4>Quotas</h4><p>Chaque génération consomme du quota Gemini. La génération complète enchaîne une trentaine d’appels (texte + images) : lancez-la sur un brief déjà réfléchi.</p></div></div>' +
-          '<div class="alert alert-info" style="margin-top:10px"><span class="alert-ico">◈</span><div><h4>Visuels</h4><p>La couverture et les panels peuvent être générés par Gemini via <span class="mono">/api/image</span>. La génération d’images nécessite un projet Gemini avec facturation active ; sinon les compositions SVG procédurales restent affichées.</p></div></div>' +
+          '<div class="alert alert-info" style="margin-top:10px"><span class="alert-ico">◈</span><div><h4>Visuels</h4><p>La couverture et les panels sont générés par Gemini via <span class="mono">/api/image</span> en priorité. Si la clé est en Free Tier, le serveur bascule automatiquement sur le repli gratuit Pollinations (1 image toutes les 45 s, watermark) ; les compositions SVG restent le dernier recours.</p></div></div>' +
           '<div class="divider"></div><p class="small" style="margin:0">Projets enregistrés : <b>' + T.state.projects.length + '</b></p>' +
         '</div></div>';
   };

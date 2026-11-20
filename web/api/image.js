@@ -64,6 +64,87 @@ function extractImage(data) {
   return null;
 }
 
+function pollinationsSize(aspectRatio) {
+  if (aspectRatio === '2:3') return { width: 768, height: 1152 };
+  if (aspectRatio === '1:1') return { width: 1024, height: 1024 };
+  if (aspectRatio === '16:9') return { width: 1024, height: 576 };
+  return { width: 768, height: 1024 };
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Repli gratuit quand Gemini refuse les images en Free Tier : Pollinations.
+ * Le tier anonyme est limité à une image toutes les 45 s ; on attend le
+ * Retry-After une fois avant de rendre la main.
+ */
+async function pollinationsImage(prompt, aspectRatio) {
+  const size = pollinationsSize(aspectRatio);
+  const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(String(prompt).slice(0, 1500)) +
+    '?width=' + size.width + '&height=' + size.height + '&nologo=true&model=sana&seed=' + Math.floor(Math.random() * 1000000000);
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 50000);
+    let upstream;
+    try {
+      upstream = await fetch(url, {
+        signal: controller.signal,
+        headers: { Accept: 'image/jpeg,image/png,*/*' }
+      });
+    } catch (error) {
+      clearTimeout(timer);
+      if (error && error.name === 'AbortError') throw new Error('Le moteur gratuit n’a pas répondu dans le délai imparti.');
+      throw new Error('Le moteur gratuit est injoignable.');
+    }
+    clearTimeout(timer);
+
+    if (upstream.ok) {
+      const contentType = (upstream.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
+      if (contentType.indexOf('image/') !== 0) throw new Error('Le moteur gratuit a renvoyé autre chose qu’une image.');
+      const buffer = Buffer.from(await upstream.arrayBuffer());
+      if (!buffer.length) throw new Error('Le moteur gratuit a renvoyé une image vide.');
+      return {
+        image: 'data:' + contentType + ';base64,' + buffer.toString('base64'),
+        mimeType: contentType,
+        model: 'sana',
+        provider: 'pollinations'
+      };
+    }
+
+    if (upstream.status === 402 || upstream.status === 429) {
+      let retryAfter = Number(upstream.headers.get('retry-after')) || 0;
+      const text = await upstream.text().catch(() => '');
+      if (!retryAfter) {
+        try {
+          const data = JSON.parse(text);
+          retryAfter = Number(data.retryAfter || data.retry_after || 0);
+        } catch (_) {}
+      }
+      if (!retryAfter) {
+        const match = text.match(/retry after (\d+)/i);
+        if (match) retryAfter = Number(match[1]);
+      }
+      const waitSeconds = retryAfter ? Math.min(Math.max(retryAfter, 1), 45) : 30;
+      if (attempt === 0) {
+        await sleep((waitSeconds + 1) * 1000);
+        continue;
+      }
+      const error = new Error('Le moteur gratuit est limité à 1 image toutes les 45 secondes. Réessayez dans ' + waitSeconds + ' s.');
+      error.status = 429;
+      error.retryAfter = waitSeconds;
+      throw error;
+    }
+
+    const text = await upstream.text().catch(() => '');
+    throw new Error('Le moteur gratuit a échoué (HTTP ' + upstream.status + ').' + (text ? ' ' + text.slice(0, 160) : ''));
+  }
+
+  throw new Error('Le moteur gratuit n’a pas pu générer l’image.');
+}
+
 async function requestImage(key, model, prompt, aspectRatio, signal) {
   const upstream = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
     method: 'POST',
@@ -174,7 +255,8 @@ module.exports = async function handler(req, res) {
           return res.status(200).json({
             image: 'data:' + image.mimeType + ';base64,' + image.data,
             mimeType: image.mimeType,
-            model
+            model,
+            provider: 'gemini'
           });
         }
         last = { status: 502, message: 'Réponse image vide du modèle ' + model + '.' };
@@ -184,7 +266,7 @@ module.exports = async function handler(req, res) {
       const message =
         (data && data.error && data.error.message) || 'Erreur Gemini (HTTP ' + upstream.status + ').';
       last = { status: upstream.status, message, model };
-      if (upstream.status === 429 && /free tier|limit:\s*0/i.test(message)) freeTierBlocked = true;
+      if ((upstream.status === 429 || upstream.status === 403) && /free tier|limit:\s*0|billing|paid tier/i.test(message)) freeTierBlocked = true;
       // Accès refusé : inutile d'essayer les autres modèles.
       if (upstream.status === 401 || upstream.status === 403) break;
       // 400 / 404 / 429 : le modèle n'est pas disponible ou quota à zéro pour
@@ -192,12 +274,21 @@ module.exports = async function handler(req, res) {
     }
 
     if (freeTierBlocked) {
-      return res.status(429).json({
-        error: {
-          message:
-            'La génération d’images nécessite un projet Gemini avec facturation active. La clé TOON_IA actuelle est en Free Tier : Google autorise 0 image. Activez la facturation sur le projet lié à la clé, puis relancez « Illustrations IA ».'
-        }
-      });
+      try {
+        const fallback = await pollinationsImage(prompt, aspectRatio);
+        res.setHeader('X-Image-Provider', 'pollinations');
+        return res.status(200).json(fallback);
+      } catch (fallbackError) {
+        const retryAfter = fallbackError && fallbackError.retryAfter ? fallbackError.retryAfter : null;
+        return res.status(fallbackError.status || 502).json({
+          error: {
+            message:
+              'Gemini refuse les images (Free Tier) et le repli gratuit Pollinations a échoué. ' +
+              (fallbackError.message || '')
+          },
+          retryAfter
+        });
+      }
     }
     return res.status(last.status || 502).json({ error: { message: last.message, model: last.model || null } });
   } catch (error) {

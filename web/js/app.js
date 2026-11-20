@@ -508,11 +508,14 @@
   }
 
   /**
-   * Génère la couverture puis les panels via /api/image. Une erreur de moteur
-   * (quota, facturation) arrête la série et laisse les visuels procéduraux en place.
+   * Génère la couverture puis les panels via /api/image. La couverture passe
+   * toujours en premier : elle rend le projet utilisable même si le repli
+   * gratuit est lent. Si Gemini est en Free Tier, le serveur bascule sur
+   * Pollinations et renvoie provider: 'pollinations'.
    */
   async function generateIllustrations(p, onProgress) {
     const errors = [];
+    let usedFallback = false;
     p.illustrationError = null;
     if (!p.marketing) {
       p.illustrationError = 'Générez d’abord le packaging de couverture, puis relancez les illustrations.';
@@ -534,8 +537,11 @@
       if (!coverDesc) throw new Error('Description de couverture absente.');
       const prompt = 'Illustration de couverture de webtoon, sans texte, sans lettres, sans logo, sans bulle. ' +
         coverDesc + ' ' + style + ' Composition verticale, cinématographique.';
-      const raw = await T.ai.image(prompt, '2:3');
-      p.coverImage = await T.compressImage(raw, 1000, 0.8);
+      const out = await T.ai.image(prompt, '2:3');
+      if (out.provider === 'pollinations') usedFallback = true;
+      p.coverImage = await T.compressImage(out.image, 1000, 0.8);
+      p.coverImageProvider = out.provider;
+      p.illustrationProvider = out.provider;
       T.save();
     } catch (e) {
       errors.push('Couverture : ' + (e.message || 'échec'));
@@ -551,8 +557,10 @@
       try {
         const prompt = 'Illustration de panel de webtoon, sans texte, sans lettres, sans bulle, sans logo. ' +
           (pn.visualPrompt || pn.actionDescription || '') + ' ' + style + ' Composition verticale, cinématographique.';
-        const raw = await T.ai.image(prompt, '3:4');
-        pn.image = await T.compressImage(raw, 720, 0.72);
+        const out = await T.ai.image(prompt, '3:4');
+        if (out.provider === 'pollinations') usedFallback = true;
+        pn.image = await T.compressImage(out.image, 720, 0.72);
+        pn.imageProvider = out.provider;
         T.save();
       } catch (e) {
         errors.push('Panel ' + (pn.orderIndex || i + 1) + ' : ' + (e.message || 'échec'));
@@ -562,6 +570,7 @@
       }
     }
     if (!errors.length) p.illustrationError = null;
+    p.illustrationProvider = usedFallback ? 'pollinations' : (p.coverImage ? (p.coverImageProvider || 'gemini') : null);
     T.save();
     return errors;
   }
@@ -908,6 +917,7 @@
       renderJob();
       if (!generated) T.toast('Illustrations IA indisponibles — le détail est affiché dans la couverture.', 'error');
       else if (errors.length) T.toast(errors.length + ' illustration(s) en échec', 'error');
+      else if (p.illustrationProvider === 'pollinations') T.toast('Repli gratuit Pollinations actif : environ 45 s par image, watermark inclus.', 'ok');
       else T.toast('Illustrations IA générées (' + (panels.length + 1) + ')', 'ok');
     }),
     'select-title': (el) => { T.update((p) => { p.marketing.selectedTitle = el.dataset.value; }); render({ keepScroll: true }); },

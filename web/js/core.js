@@ -559,12 +559,13 @@
 
   /**
    * Génère une illustration via le proxy /api/image (clé TOON_IA côté serveur).
-   * Renvoie une data URL prête à afficher.
+   * Le serveur tente Gemini puis bascule sur Pollinations si la clé est en
+   * Free Tier. Renvoie { image, provider, model }.
    */
   AI.image = async function (prompt, aspectRatio) {
     if (AI.server.checked && !AI.hasServerKey()) throw new Error(NO_KEY_MESSAGE);
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 90000);
+    const timer = setTimeout(() => ctrl.abort(), 150000);
     let res;
     try {
       res = await fetch('/api/image', {
@@ -575,7 +576,7 @@
       });
     } catch (e) {
       clearTimeout(timer);
-      if (e.name === 'AbortError') throw new Error('Délai dépassé (90 s) : l’image n’a pas été générée.');
+      if (e.name === 'AbortError') throw new Error('Délai dépassé (150 s) : l’image n’a pas été générée.');
       throw new Error('Réseau indisponible ou requête image bloquée. ' + (e.message || ''));
     }
     clearTimeout(timer);
@@ -585,12 +586,17 @@
       const message = data && data.error && data.error.message ? data.error.message : 'HTTP ' + res.status;
       const err = new Error(message);
       err.status = res.status;
+      err.retryAfter = data && data.retryAfter ? data.retryAfter : null;
       throw err;
     }
     if (!data || typeof data.image !== 'string' || data.image.indexOf('data:image/') !== 0) {
       throw new Error('Réponse image invalide du serveur.');
     }
-    return data.image;
+    return {
+      image: data.image,
+      provider: data.provider === 'pollinations' ? 'pollinations' : 'gemini',
+      model: data.model || null
+    };
   };
 
   function canonContext(p) {
